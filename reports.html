@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAJABA - റിപ്പോർട്ടുകൾ</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#153F35">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WAJABA Reports">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700;800&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#153F35; --forest-dark:#0E2C25;
+    --cream:#F7F4EC; --gold:#D9A62E; --gold-dark:#B5871E;
+    --white:#FFFFFF; --red:#C0392B; --gray:#6B7268; --line:#E3DFD3;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);font-family:'Noto Sans Malayalam','DM Sans',sans-serif;color:var(--forest-dark);}
+  .wrap{max-width:1100px;margin:0 auto;padding-bottom:50px;}
+
+  header{background:var(--forest);color:var(--cream);padding:20px 24px;border-radius:0 0 22px 22px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand svg{width:30px;height:30px;}
+  .brand-text{font-family:'DM Sans',sans-serif;font-weight:700;font-size:20px;color:var(--gold);letter-spacing:1px;}
+  .page-title{font-size:15px;opacity:0.85;margin-top:6px;}
+
+  main{padding:20px;}
+  .card{background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:0 2px 14px rgba(21,63,53,0.06);margin-bottom:16px;}
+
+  .label{font-size:14px;font-weight:600;margin-bottom:6px;}
+  input[type=text],input[type=password],input[type=date]{
+    width:100%;padding:14px;font-size:17px;font-family:inherit;
+    border:2px solid var(--line);border-radius:10px;margin-bottom:12px;background:var(--cream);color:var(--forest-dark);
+  }
+  input:focus{outline:none;border-color:var(--gold);}
+
+  .btn{padding:14px 20px;font-size:16px;font-weight:700;font-family:inherit;border:none;border-radius:12px;cursor:pointer;}
+  .btn-primary{background:var(--gold);color:var(--forest-dark);}
+  .btn-outline{background:transparent;border:2px solid var(--forest);color:var(--forest);}
+  .btn:disabled{opacity:0.45;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  .report-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  @media(max-width:520px){.report-type-grid{grid-template-columns:1fr;}}
+  .type-btn{
+    padding:16px;border-radius:12px;border:2px solid var(--line);background:var(--cream);
+    font-weight:700;font-size:15px;cursor:pointer;text-align:center;color:var(--forest-dark);
+  }
+  .type-btn.active{border-color:var(--gold);background:#FCF3E0;color:var(--gold-dark);}
+
+  .date-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:480px){.date-row{grid-template-columns:1fr;}}
+  .day-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+  @media(max-width:560px){.day-grid{grid-template-columns:repeat(2,1fr);}}
+  .day-btn{padding:12px 8px;border-radius:10px;border:2px solid var(--line);background:var(--cream);
+    font-weight:700;font-size:13px;cursor:pointer;text-align:center;color:var(--forest-dark);}
+  .day-btn.active{border-color:var(--gold);background:#FCF3E0;color:var(--gold-dark);}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th,td{padding:10px 8px;text-align:center;border:1px solid var(--line);}
+  th{background:var(--forest);color:var(--cream);font-weight:700;position:sticky;top:0;}
+  td:first-child, th:first-child{text-align:left;}
+  tr:nth-child(even) td{background:#FAF8F2;}
+  tr.total-row td{background:#FCF3E0;font-weight:700;}
+  .table-scroll{overflow-x:auto;}
+
+  .msg{padding:14px 16px;border-radius:12px;margin-bottom:14px;font-size:15px;font-weight:600;}
+  .msg-error{background:#FBEAE8;color:var(--red);}
+  .msg-info{background:#FCF3E0;color:var(--gold-dark);}
+
+  .hidden{display:none !important;}
+  .center{text-align:center;}
+  .muted{color:var(--gray);font-size:13px;}
+  .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,0.4);border-top-color:var(--forest-dark);
+    border-radius:50%;display:inline-block;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .logout-link{text-align:right;font-size:13px;color:var(--forest);text-decoration:underline;cursor:pointer;margin-bottom:6px;}
+
+  @media print {
+    header, .card.controls, .logout-link, .no-print { display:none !important; }
+    body{background:#fff;}
+    .card.results{box-shadow:none;padding:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="22" stroke="#D9A62E" stroke-width="2.5"/>
+        <path d="M14 20c0 6 4.5 11 10 11s10-5 10-11" stroke="#D9A62E" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M24 9v6M18 10l1.5 5M30 10l-1.5 5" stroke="#D9A62E" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-text">WAJABA</div>
+    </div>
+    <div class="page-title">റിപ്പോർട്ടുകൾ</div>
+  </header>
+
+  <main>
+    <!-- LOGIN -->
+    <div id="loginScreen">
+      <div class="card">
+        <div class="label">മൊബൈൽ നമ്പർ</div>
+        <input type="text" id="loginMobile" maxlength="10" inputmode="numeric" placeholder="10 അക്ക നമ്പർ">
+        <div class="label">PIN</div>
+        <input type="password" id="loginPin" maxlength="6" inputmode="numeric" placeholder="PIN">
+        <div id="loginError" class="msg msg-error hidden"></div>
+        <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">ലോഗിൻ ചെയ്യുക</button>
+      </div>
+      <p class="muted center">Register clerk / Headmaster / Admin റോൾ ഉള്ളവർക്ക് മാത്രം ഈ പേജ് ലഭ്യമാണ്</p>
+    </div>
+
+    <!-- REPORT SCREEN -->
+    <div id="reportScreen" class="hidden">
+      <div class="btn-row no-print" style="justify-content:flex-end;margin-bottom:6px;">
+        <a href="index.html" class="btn btn-outline" style="text-decoration:none;">📝 എൻട്രി നൽകാൻ</a>
+        <a href="admin.html" id="adminLink" class="btn btn-outline hidden" style="text-decoration:none;">⚙️ Admin</a>
+        <span class="logout-link" onclick="doLogout()" style="align-self:center;">ലോഗ്ഔട്ട് (<span id="userNameTag"></span>)</span>
+      </div>
+
+      <div class="card controls">
+        <div class="label">റിപ്പോർട്ട് തരം</div>
+        <div class="report-type-grid">
+          <div class="type-btn" data-type="divisionWise" onclick="selectType('divisionWise')">Division അടിസ്ഥാനത്തിൽ</div>
+          <div class="type-btn" data-type="standardWise" onclick="selectType('standardWise')">Standard അടിസ്ഥാനത്തിൽ</div>
+          <div class="type-btn" data-type="register" onclick="selectType('register')">രജിസ്റ്റർ ഫോർമാറ്റ്</div>
+          <div class="type-btn" data-type="govtUpload" onclick="selectType('govtUpload')">വെബ്സൈറ്റ് അപ്‌ലോഡ്</div>
+        </div>
+
+        <div class="label">തീയതി</div>
+        <div class="day-grid" id="dayChips">
+          <div class="day-btn" data-offset="0" onclick="selectDayOffset(0)">ഇന്ന്</div>
+          <div class="day-btn" data-offset="1" onclick="selectDayOffset(1)">ഇന്നലെ</div>
+          <div class="day-btn" data-offset="2" onclick="selectDayOffset(2)">2 ദിവസം മുൻപ്</div>
+          <div class="day-btn" data-offset="3" onclick="selectDayOffset(3)">3 ദിവസം മുൻപ്</div>
+        </div>
+        <div class="label" style="margin-top:10px;">അല്ലെങ്കിൽ പഴയ തീയതി തിരഞ്ഞെടുക്കുക</div>
+        <input type="date" id="reportDate" onchange="onManualDateChange()">
+
+        <button class="btn btn-primary" id="genBtn" onclick="generateReport()">റിപ്പോർട്ട് കാണിക്കുക</button>
+      </div>
+
+      <div id="resultArea"></div>
+    </div>
+  </main>
+  <div class="no-print" style="text-align:center;font-size:11px;color:var(--gray);padding:20px;opacity:0.7;" id="footerNote">WAJABA</div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyjqARLU3iPeLSWPUYmKgTZGfoie1DP7otoJTfiCBL9gIj1LadsI8_b9pS_oS7SkNlD/exec";
+let session = { teacherId:null, name:null, role:null };
+let selectedType = 'divisionWise';
+let lastRows = [];
+let lastReportType = '';
+
+function callApi(payload){
+  return fetch(API_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  }).then(r => r.json());
+}
+
+function localGet(){ try{ const v=localStorage.getItem('wajaba_session'); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function localSet(o){ try{ localStorage.setItem('wajaba_session', JSON.stringify(o)); }catch(e){} }
+function localClear(){ try{ localStorage.removeItem('wajaba_session'); }catch(e){} }
+
+document.addEventListener('DOMContentLoaded', function(){
+  selectDayOffset(0);
+
+  callApi({ action:"getAppInfo" }).then(res=>{
+    if (res.success) document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName + (res.developerPhone ? ' · Support: ' + res.developerPhone : '');
+  });
+
+  const saved = localGet();
+  if (saved && ['clerk','headmaster','admin'].indexOf(String(saved.role||'').trim().toLowerCase()) !== -1){
+    session = saved; showReportScreen();
+  } else if (saved) {
+    // logged in elsewhere but role doesn't have report access - don't auto-show reports
+  }
+  selectType('divisionWise');
+});
+
+function selectDayOffset(n){
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  document.getElementById('reportDate').value = d.toISOString().slice(0,10);
+  document.querySelectorAll('.day-btn').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-offset') === String(n));
+  });
+}
+function onManualDateChange(){
+  document.querySelectorAll('.day-btn').forEach(el => el.classList.remove('active'));
+}
+
+function doLogin(){
+  const mobile = document.getElementById('loginMobile').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.classList.add('hidden');
+  if (!mobile || !pin){ errEl.innerText="മൊബൈൽ നമ്പറും PIN-ഉം നൽകുക"; errEl.classList.remove('hidden'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>ലോഗിൻ ചെയ്യുന്നു...';
+
+  callApi({ action:"login", mobile, pin }).then(res=>{
+    btn.disabled = false; btn.innerText = "ലോഗിൻ ചെയ്യുക";
+    if (!res.success){ errEl.innerText = res.message || "ലോഗിൻ പരാജയപ്പെട്ടു"; errEl.classList.remove('hidden'); return; }
+
+    const role = String(res.role||'').trim().toLowerCase();
+    if (['clerk','headmaster','admin'].indexOf(role) === -1){
+      errEl.innerText = "ഈ പേജ് നിങ്ങൾക്ക് ലഭ്യമല്ല (Reports access ഇല്ല)";
+      errEl.classList.remove('hidden');
+      return;
+    }
+    session = { teacherId: res.teacherId, name: res.name, role: role };
+    localSet(session);
+    showReportScreen();
+  }).catch(()=>{
+    btn.disabled = false; btn.innerText = "ലോഗിൻ ചെയ്യുക";
+    errEl.innerText = "കണക്ഷൻ പിശക്. വീണ്ടും ശ്രമിക്കുക";
+    errEl.classList.remove('hidden');
+  });
+}
+
+function doLogout(){
+  localClear();
+  session = { teacherId:null, name:null, role:null };
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('reportScreen').classList.add('hidden');
+  document.getElementById('loginMobile').value='';
+  document.getElementById('loginPin').value='';
+}
+
+function showReportScreen(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('reportScreen').classList.remove('hidden');
+  document.getElementById('userNameTag').innerText = session.name;
+  document.getElementById('adminLink').classList.toggle('hidden', String(session.role||'').trim().toLowerCase() !== 'admin');
+}
+
+function selectType(type){
+  selectedType = type;
+  document.querySelectorAll('.type-btn').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-type') === type);
+  });
+}
+
+function esc(v){ return (v===undefined||v===null) ? '' : String(v); }
+function formatDateDisplay(isoDate){
+  const parts = String(isoDate).split('-');
+  if (parts.length !== 3) return isoDate;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mIdx = parseInt(parts[1],10) - 1;
+  return parseInt(parts[2],10) + ' ' + (months[mIdx]||parts[1]) + ' ' + parts[0];
+}
+
+function generateReport(){
+  const reportDate = document.getElementById('reportDate').value;
+  if (!reportDate){ alert("തീയതി തിരഞ്ഞെടുക്കുക"); return; }
+  const fromDate = reportDate, toDate = reportDate;
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>ലോഡ് ചെയ്യുന്നു...';
+  document.getElementById('resultArea').innerHTML = '';
+
+  callApi({
+    action:"getReport", reportType: selectedType,
+    fromDate, toDate, teacherId: session.teacherId
+  }).then(res=>{
+    btn.disabled = false; btn.innerText = "റിപ്പോർട്ട് കാണിക്കുക";
+    if (!res.success){
+      document.getElementById('resultArea').innerHTML =
+        '<div class="msg msg-error">' + esc(res.message) + '</div>';
+      return;
+    }
+    lastRows = res.rows; lastReportType = res.reportType;
+    renderReport(res.reportType, res.rows, fromDate, toDate);
+  }).catch(()=>{
+    btn.disabled = false; btn.innerText = "റിപ്പോർട്ട് കാണിക്കുക";
+    document.getElementById('resultArea').innerHTML =
+      '<div class="msg msg-error">കണക്ഷൻ പിശക്. വീണ്ടും ശ്രമിക്കുക</div>';
+  });
+}
+
+function renderReport(type, rows, fromDate, toDate){
+  const area = document.getElementById('resultArea');
+  if (!rows || rows.length === 0){
+    area.innerHTML = '<div class="msg msg-info">ഈ കാലയളവിൽ ഡാറ്റ ഒന്നും ലഭ്യമല്ല</div>';
+    return;
+  }
+
+  let head = '', body = '';
+  if (type === 'divisionWise'){
+    head = '<tr><th rowspan="2">ക്ലാസ്</th><th colspan="2">ഭക്ഷണം</th><th rowspan="2">ആകെ</th><th colspan="2">പാൽ</th><th rowspan="2">ആകെ</th><th colspan="2">മുട്ട</th><th rowspan="2">ആകെ</th></tr><tr><th>Boys</th><th>Girls</th><th>Boys</th><th>Girls</th><th>Boys</th><th>Girls</th></tr>';
+    body = rows.map(r => `<tr><td>${esc(r.className)}</td><td>${r.boys}</td><td>${r.girls}</td><td>${r.total}</td><td>${r.milkBoys}</td><td>${r.milkGirls}</td><td>${r.milk}</td><td>${r.eggBoys}</td><td>${r.eggGirls}</td><td>${r.egg}</td></tr>`).join('');
+  } else if (type === 'standardWise'){
+    head = '<tr><th rowspan="2">Standard</th><th colspan="2">ഭക്ഷണം</th><th rowspan="2">ആകെ</th><th colspan="2">പാൽ</th><th rowspan="2">ആകെ</th><th colspan="2">മുട്ട</th><th rowspan="2">ആകെ</th></tr><tr><th>Boys</th><th>Girls</th><th>Boys</th><th>Girls</th><th>Boys</th><th>Girls</th></tr>';
+    body = rows.map((r,i) => `<tr class="${i===rows.length-1?'total-row':''}"><td>${esc(r.standard)}</td><td>${r.boys}</td><td>${r.girls}</td><td>${r.total}</td><td>${r.milkBoys}</td><td>${r.milkGirls}</td><td>${r.milk}</td><td>${r.eggBoys}</td><td>${r.eggGirls}</td><td>${r.egg}</td></tr>`).join('');
+  } else if (type === 'register'){
+    head = '<tr><th>തീയതി</th><th>ക്ലാസ്</th><th>Boys</th><th>Girls</th><th>ആകെ</th><th>പാൽ</th><th>മുട്ട</th><th>Remarks</th></tr>';
+    body = rows.map(r => `<tr><td>${formatDateDisplay(r.date)}</td><td>${esc(r.className)}</td><td>${r.boys}</td><td>${r.girls}</td><td>${r.total}</td><td>${r.milk}</td><td>${r.egg}</td><td>${esc(r.remarks)}</td></tr>`).join('');
+  } else if (type === 'govtUpload'){
+    head = '<tr><th rowspan="2">തീയതി</th><th colspan="2">ഭക്ഷണം</th><th rowspan="2">ആകെ</th><th colspan="2">പാൽ</th><th rowspan="2">ആകെ</th><th colspan="2">മുട്ട</th><th rowspan="2">ആകെ</th></tr><tr><th>Boys</th><th>Girls</th><th>Boys</th><th>Girls</th><th>Boys</th><th>Girls</th></tr>';
+    body = rows.map(r => `<tr><td>${formatDateDisplay(r.date)}</td><td>${r.boys}</td><td>${r.girls}</td><td>${r.total}</td><td>${r.milkBoys}</td><td>${r.milkGirls}</td><td>${r.milk}</td><td>${r.eggBoys}</td><td>${r.eggGirls}</td><td>${r.egg}</td></tr>`).join('');
+  }
+
+  area.innerHTML = `
+    <div class="card results">
+      <div class="btn-row no-print" style="margin-bottom:14px;">
+        <button class="btn btn-outline" onclick="window.print()">🖨️ പ്രിന്റ് ചെയ്യുക</button>
+        <button class="btn btn-outline" onclick="downloadCsv()">⬇️ CSV ഡൗൺലോഡ്</button>
+      </div>
+      <p class="muted">തീയതി: ${formatDateDisplay(fromDate)}</p>
+      <div class="table-scroll">
+        <table><thead>${head}</thead><tbody>${body}</tbody></table>
+      </div>
+    </div>`;
+}
+
+function downloadCsv(){
+  if (!lastRows || lastRows.length === 0) return;
+  const keys = Object.keys(lastRows[0]);
+  let csv = keys.join(',') + '\n';
+  lastRows.forEach(r => {
+    csv += keys.map(k => '"' + String(r[k]===undefined?'':r[k]).replace(/"/g,'""') + '"').join(',') + '\n';
+  });
+  const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'wajaba_' + lastReportType + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

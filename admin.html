@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAJABA - Admin Panel</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#153F35">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WAJABA Admin">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700;800&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#153F35; --forest-dark:#0E2C25;
+    --cream:#F7F4EC; --gold:#D9A62E; --gold-dark:#B5871E;
+    --white:#FFFFFF; --red:#C0392B; --gray:#6B7268; --line:#E3DFD3; --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);font-family:'Noto Sans Malayalam','DM Sans',sans-serif;color:var(--forest-dark);}
+  .wrap{max-width:900px;margin:0 auto;padding-bottom:50px;}
+  header{background:var(--forest);color:var(--cream);padding:20px 24px;border-radius:0 0 22px 22px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand svg{width:30px;height:30px;}
+  .brand-text{font-family:'DM Sans',sans-serif;font-weight:700;font-size:20px;color:var(--gold);letter-spacing:1px;}
+  .page-title{font-size:15px;opacity:0.85;margin-top:6px;}
+  main{padding:20px;}
+  .card{background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:0 2px 14px rgba(21,63,53,0.06);margin-bottom:16px;}
+  .label{font-size:14px;font-weight:600;margin-bottom:6px;}
+  input[type=text],input[type=password],input[type=date],select{
+    width:100%;padding:13px;font-size:16px;font-family:inherit;border:2px solid var(--line);
+    border-radius:10px;margin-bottom:12px;background:var(--cream);color:var(--forest-dark);
+  }
+  input:focus,select:focus{outline:none;border-color:var(--gold);}
+  .btn{padding:13px 18px;font-size:15px;font-weight:700;font-family:inherit;border:none;border-radius:10px;cursor:pointer;}
+  .btn-primary{background:var(--gold);color:var(--forest-dark);}
+  .btn-outline{background:transparent;border:2px solid var(--forest);color:var(--forest);}
+  .btn-danger{background:#FBEAE8;color:var(--red);border:2px solid #F3C9C3;}
+  .btn-sm{padding:8px 12px;font-size:13px;}
+  .btn:disabled{opacity:0.45;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  .tab-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .tab-btn{padding:12px 16px;border-radius:10px;border:2px solid var(--line);background:var(--white);
+    font-weight:700;font-size:14px;cursor:pointer;color:var(--forest-dark);}
+  .tab-btn.active{border-color:var(--gold);background:#FCF3E0;color:var(--gold-dark);}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:9px 6px;text-align:center;border:1px solid var(--line);}
+  th{background:var(--forest);color:var(--cream);}
+  td:nth-child(2), th:nth-child(2){text-align:left;}
+  tr:nth-child(even) td{background:#FAF8F2;}
+  .table-scroll{overflow-x:auto;margin-bottom:14px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr;}}
+
+  .weekday-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .day-chip{padding:10px 14px;border-radius:20px;border:2px solid var(--line);background:var(--cream);
+    font-size:13px;font-weight:700;cursor:pointer;}
+  .day-chip.active{border-color:var(--gold);background:#FCF3E0;color:var(--gold-dark);}
+
+  .msg{padding:14px 16px;border-radius:12px;margin-bottom:14px;font-size:15px;font-weight:600;}
+  .msg-error{background:#FBEAE8;color:var(--red);}
+  .msg-success{background:#E8F3EC;color:var(--forest);}
+  .msg-info{background:#FCF3E0;color:var(--gold-dark);}
+  .hidden{display:none !important;}
+  .center{text-align:center;}
+  .muted{color:var(--gray);font-size:13px;}
+  .section-title{font-size:15px;font-weight:700;color:var(--gold-dark);margin:16px 0 8px;}
+  .logout-link{text-align:right;font-size:13px;color:var(--forest);text-decoration:underline;cursor:pointer;margin-bottom:6px;}
+  .nav-link{font-size:14px;color:var(--forest);text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="22" stroke="#D9A62E" stroke-width="2.5"/>
+        <path d="M14 20c0 6 4.5 11 10 11s10-5 10-11" stroke="#D9A62E" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M24 9v6M18 10l1.5 5M30 10l-1.5 5" stroke="#D9A62E" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-text">WAJABA</div>
+    </div>
+    <div class="page-title">Admin Panel</div>
+  </header>
+
+  <main>
+    <!-- LOGIN -->
+    <div id="loginScreen">
+      <div class="card">
+        <div class="label">മൊബൈൽ നമ്പർ</div>
+        <input type="text" id="loginMobile" maxlength="10" inputmode="numeric" placeholder="10 അക്ക നമ്പർ">
+        <div class="label">PIN</div>
+        <input type="password" id="loginPin" maxlength="6" inputmode="numeric" placeholder="PIN">
+        <div id="loginError" class="msg msg-error hidden"></div>
+        <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">ലോഗിൻ ചെയ്യുക</button>
+      </div>
+      <p class="muted center">Admin റോൾ ഉള്ളവർക്ക് മാത്രം ഈ പേജ് ലഭ്യമാണ്</p>
+    </div>
+
+    <!-- ADMIN SCREEN -->
+    <div id="adminScreen" class="hidden">
+      <div class="btn-row" style="justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <a href="index.html" class="nav-link">📝 എൻട്രി</a> &nbsp;|&nbsp;
+          <a href="reports.html" class="nav-link">📊 റിപ്പോർട്ടുകൾ</a>
+        </div>
+        <div class="logout-link" onclick="doLogout()">ലോഗ്ഔട്ട് (<span id="userNameTag"></span>)</div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-btn active" data-tab="dashboard" onclick="showTab('dashboard')">📊 Dashboard</div>
+        <div class="tab-btn" data-tab="teachers" onclick="showTab('teachers')">👩‍🏫 Teachers</div>
+        <div class="tab-btn" data-tab="classes" onclick="showTab('classes')">🏫 Classes</div>
+        <div class="tab-btn" data-tab="settings" onclick="showTab('settings')">⚙️ Settings</div>
+        <div class="tab-btn" data-tab="holidays" onclick="showTab('holidays')">📅 Holidays</div>
+        <div class="tab-btn" data-tab="history" onclick="showTab('history')">🕐 History</div>
+        <div class="tab-btn" data-tab="logs" onclick="showTab('logs')">🧾 Logs</div>
+      </div>
+
+      <div id="statusArea"></div>
+
+      <!-- DASHBOARD TAB -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="card" id="dashboardArea"><p class="muted">ലോഡ് ചെയ്യുന്നു...</p></div>
+      </div>
+
+      <!-- TEACHERS TAB -->
+      <div id="tab-teachers" class="tab-content hidden">
+        <div class="card">
+          <div class="table-scroll"><table id="teachersTable"><thead>
+            <tr><th>ID</th><th>Name</th><th>Mobile</th><th>Role</th><th>Classes</th><th>Active</th><th></th><th></th></tr>
+          </thead><tbody></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="section-title">പുതിയ Teacher ചേർക്കുക / Edit ചെയ്യുക</div>
+          <input type="hidden" id="t_TeacherID">
+          <div class="grid2">
+            <div><div class="label">Name</div><input type="text" id="t_Name"></div>
+            <div><div class="label">Mobile</div><input type="text" id="t_Mobile" maxlength="10" inputmode="numeric" placeholder="10 അക്കം"></div>
+          </div>
+          <div class="label">Role</div>
+          <select id="t_Role">
+            <option value="teacher">teacher</option>
+            <option value="clerk">clerk</option>
+            <option value="headmaster">headmaster</option>
+            <option value="admin">admin</option>
+          </select>
+          <p class="muted" style="margin-top:-6px;">PIN സ്വയമേവ generate ചെയ്യും - ചുവടെയുള്ള "📲 Send" ബട്ടൺ വഴി WhatsApp-ൽ അയക്കാം</p>
+          <div class="label">Assigned Classes (comma-separated ClassID, അല്ലെങ്കിൽ "full")</div>
+          <input type="text" id="t_AssignedClasses" placeholder="1-A,1-B അല്ലെങ്കിൽ full">
+          <div id="msgTeacher"></div>
+          <div class="grid2">
+            <div><div class="label">Active</div>
+              <select id="t_Active"><option value="Y">Y</option><option value="N">N</option></select>
+            </div>
+            <div style="align-self:flex-end;">
+              <button class="btn btn-primary" style="width:100%;" onclick="saveTeacher()">സേവ് ചെയ്യുക</button>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="clearTeacherForm()">+ പുതിയ Teacher</button>
+        </div>
+      </div>
+
+
+      <!-- CLASSES TAB -->
+      <div id="tab-classes" class="tab-content hidden">
+        <div class="card">
+          <div class="table-scroll"><table id="classesTable"><thead>
+            <tr><th>ClassID</th><th>Standard</th><th>Division</th><th>Category</th><th>Active</th><th></th></tr>
+          </thead><tbody></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="section-title">പുതിയ ക്ലാസ് ചേർക്കുക</div>
+          <div class="grid2">
+            <div><div class="label">Standard</div><input type="text" id="c_Standard" placeholder="1, LKG, etc"></div>
+            <div><div class="label">Division</div><input type="text" id="c_Division" placeholder="A"></div>
+          </div>
+          <div id="msgClass"></div>
+          <div class="grid2">
+            <div><div class="label">Category</div>
+              <select id="c_Category">
+                <option value="PrePrimary">PrePrimary</option>
+                <option value="LP">LP</option>
+                <option value="UP">UP</option>
+                <option value="HS">HS</option>
+              </select>
+            </div>
+            <div style="align-self:flex-end;">
+              <button class="btn btn-primary" style="width:100%;" onclick="saveClass()">ചേർക്കുക</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div id="tab-settings" class="tab-content hidden">
+        <div class="card">
+          <div class="section-title">സ്കൂൾ വിവരങ്ങൾ</div>
+          <div class="label">School Name</div>
+          <div style="padding:13px;background:var(--line);border-radius:10px;margin-bottom:6px;color:var(--gray);" id="cfg_SchoolNameDisplay">-</div>
+          <p class="muted" style="margin-top:-2px;">ഇത് മാറ്റാൻ ഡെവലപ്പറെ ബന്ധപ്പെടുക</p>
+          <div class="label">Headmaster Name</div><input type="text" id="cfg_HeadmasterName">
+          <div class="label">Phone</div><input type="text" id="cfg_Phone">
+
+          <div class="section-title">പാൽ നിർബന്ധമായ ദിവസങ്ങൾ</div>
+          <div class="weekday-grid" id="milkDaysGrid"></div>
+
+          <div class="section-title">മുട്ട നിർബന്ധമായ ദിവസങ്ങൾ</div>
+          <div class="weekday-grid" id="eggDaysGrid"></div>
+
+          <div id="msgSettings"></div>
+          <button class="btn btn-primary" onclick="saveSettings()">Settings സേവ് ചെയ്യുക</button>
+        </div>
+      </div>
+
+      <!-- HOLIDAYS TAB -->
+      <div id="tab-holidays" class="tab-content hidden">
+        <div class="card">
+          <div class="table-scroll"><table id="holidaysTable"><thead>
+            <tr><th>Date</th><th>Reason</th><th></th></tr>
+          </thead><tbody></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="section-title">പുതിയ അവധി ദിവസം ചേർക്കുക</div>
+          <div class="grid2">
+            <div><div class="label">Date</div><input type="date" id="h_Date"></div>
+            <div><div class="label">Reason</div><input type="text" id="h_Reason"></div>
+          </div>
+          <div id="msgHoliday"></div>
+          <button class="btn btn-primary" onclick="saveHoliday()">ചേർക്കുക</button>
+        </div>
+      </div>
+
+      <!-- HISTORY TAB (all submissions, editable = correction) -->
+      <div id="tab-history" class="tab-content hidden">
+        <div class="card">
+          <div class="grid2">
+            <div><div class="label">From Date</div><input type="date" id="hist_fromDate"></div>
+            <div><div class="label">To Date</div><input type="date" id="hist_toDate"></div>
+          </div>
+          <button class="btn btn-primary" onclick="loadHistory()">കാണിക്കുക</button>
+          <div id="msgHistory"></div>
+        </div>
+        <div class="card">
+          <div class="table-scroll"><table id="historyTable"><thead>
+            <tr><th>തീയതി</th><th>ക്ലാസ്</th><th>ആൺ</th><th>പെൺ</th><th>ആകെ</th><th>പാൽ</th><th>മുട്ട</th><th></th></tr>
+          </thead><tbody></tbody></table></div>
+        </div>
+
+        <!-- Correction form (shown when Edit is clicked) -->
+        <div class="card hidden" id="correctionCard">
+          <div class="section-title">തിരുത്തുക: <span id="corr_label"></span></div>
+          <input type="hidden" id="corr_date">
+          <input type="hidden" id="corr_classId">
+          <div class="grid2">
+            <div><div class="label">ആൺ ഭക്ഷണം</div><input type="text" id="corr_boysAte"></div>
+            <div><div class="label">പെൺ ഭക്ഷണം</div><input type="text" id="corr_girlsAte"></div>
+          </div>
+          <div class="grid2">
+            <div><div class="label">പാൽ ആൺ</div><input type="text" id="corr_milkBoys"></div>
+            <div><div class="label">പാൽ പെൺ</div><input type="text" id="corr_milkGirls"></div>
+          </div>
+          <div class="grid2">
+            <div><div class="label">മുട്ട ആൺ</div><input type="text" id="corr_eggBoys"></div>
+            <div><div class="label">മുട്ട പെൺ</div><input type="text" id="corr_eggGirls"></div>
+          </div>
+          <div class="label">Remarks</div><input type="text" id="corr_remarks">
+          <div id="msgCorrection"></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="saveCorrection()">തിരുത്തൽ സേവ് ചെയ്യുക</button>
+            <button class="btn btn-outline" onclick="closeCorrection()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGS TAB -->
+      <div id="tab-logs" class="tab-content hidden">
+        <div class="card">
+          <button class="btn btn-outline btn-sm" onclick="loadLogs()">🔄 Refresh</button>
+          <div class="table-scroll" style="margin-top:12px;"><table id="logsTable"><thead>
+            <tr><th>സമയം</th><th>User</th><th>Action</th><th>Details</th></tr>
+          </thead><tbody></tbody></table></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+  <div style="text-align:center;font-size:11px;color:var(--gray);padding:20px;opacity:0.7;" id="footerNote">WAJABA</div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyjqARLU3iPeLSWPUYmKgTZGfoie1DP7otoJTfiCBL9gIj1LadsI8_b9pS_oS7SkNlD/exec";
+let session = { teacherId:null, name:null, role:null };
+let allData = { teachers:[], classes:[], holidays:[], config:{} };
+const WEEKDAYS = [['Mon','തിങ്കൾ'],['Tue','ചൊവ്വ'],['Wed','ബുധൻ'],['Thu','വ്യാഴം'],['Fri','വെള്ളി'],['Sat','ശനി'],['Sun','ഞായർ']];
+
+function callApi(payload){
+  return fetch(API_URL, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+    .then(r => r.json());
+}
+function localGet(){ try{ const v=localStorage.getItem('wajaba_session'); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function localSet(o){ try{ localStorage.setItem('wajaba_session', JSON.stringify(o)); }catch(e){} }
+function localClear(){ try{ localStorage.removeItem('wajaba_session'); }catch(e){} }
+function esc(v){ return (v===undefined||v===null)?'':String(v); }
+function showStatus(type, text, targetId){
+  targetId = targetId || 'statusArea';
+  const el = document.getElementById(targetId);
+  el.innerHTML = `<div class="msg msg-${type}">${text}</div>`;
+  setTimeout(()=>{ el.innerHTML=''; }, 4000);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  buildWeekdayChips();
+  callApi({ action:"getAppInfo" }).then(res=>{
+    if (res.success) document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName + (res.developerPhone ? ' · Support: ' + res.developerPhone : '');
+  });
+  const saved = localGet();
+  if (saved && String(saved.role||'').trim().toLowerCase() === 'admin'){
+    session = saved; showAdminScreen();
+  }
+});
+
+function doLogin(){
+  const mobile = document.getElementById('loginMobile').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.classList.add('hidden');
+  if (!mobile || !pin){ errEl.innerText="മൊബൈൽ നമ്പറും PIN-ഉം നൽകുക"; errEl.classList.remove('hidden'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.innerText = "ലോഗിൻ ചെയ്യുന്നു...";
+
+  callApi({ action:"login", mobile, pin }).then(res=>{
+    btn.disabled = false; btn.innerText = "ലോഗിൻ ചെയ്യുക";
+    if (!res.success){ errEl.innerText = res.message || "ലോഗിൻ പരാജയപ്പെട്ടു"; errEl.classList.remove('hidden'); return; }
+    if (String(res.role||'').trim().toLowerCase() !== 'admin'){
+      errEl.innerText = "ഈ പേജ് Admin-ന് മാത്രം ലഭ്യമാണ്"; errEl.classList.remove('hidden'); return;
+    }
+    session = { teacherId: res.teacherId, name: res.name, role: res.role, classes: res.classes };
+    localSet(session);
+    showAdminScreen();
+  }).catch(()=>{
+    btn.disabled = false; btn.innerText = "ലോഗിൻ ചെയ്യുക";
+    errEl.innerText = "കണക്ഷൻ പിശക്"; errEl.classList.remove('hidden');
+  });
+}
+
+function doLogout(){
+  localClear();
+  session = { teacherId:null, name:null, role:null };
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('adminScreen').classList.add('hidden');
+}
+
+function showAdminScreen(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('adminScreen').classList.remove('hidden');
+  document.getElementById('userNameTag').innerText = session.name;
+  loadAll();
+}
+
+function showTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.toggle('active', el.getAttribute('data-tab')===tab));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.toggle('hidden', el.id !== 'tab-'+tab));
+  if (tab === 'logs') loadLogs();
+  if (tab === 'history' && !document.getElementById('hist_fromDate').value){
+    const today = new Date().toISOString().slice(0,10);
+    document.getElementById('hist_fromDate').value = today;
+    document.getElementById('hist_toDate').value = today;
+  }
+}
+
+function loadAll(){
+  callApi({ action:"adminGetAll", teacherId: session.teacherId }).then(res=>{
+    if (!res.success){ showStatus('error', esc(res.message)); return; }
+    allData = res;
+    renderTeachers(); renderClasses(); renderHolidays(); renderSettings();
+    loadDashboard();
+  });
+}
+
+// ---------- TEACHERS ----------
+function renderTeachers(){
+  const tbody = document.querySelector('#teachersTable tbody');
+  tbody.innerHTML = allData.teachers.map(t => `
+    <tr>
+      <td>${esc(t.TeacherID)}</td><td>${esc(t.Name)}</td><td>${esc(t.Mobile)}</td>
+      <td>${esc(t.Role)}</td><td>${esc(t.AssignedClasses)}</td><td>${esc(t.Active)}</td>
+      <td><button class="btn btn-outline btn-sm" onclick='editTeacher(${JSON.stringify(t).replace(/'/g,"&apos;")})'>Edit</button></td>
+      <td><button class="btn btn-outline btn-sm" onclick="sendWhatsapp('${esc(t.TeacherID)}')">📲 Send</button></td>
+    </tr>`).join('');
+}
+function clearTeacherForm(){
+  ['t_TeacherID','t_Name','t_Mobile','t_AssignedClasses'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('t_Role').value = 'teacher';
+  document.getElementById('t_Active').value = 'Y';
+}
+function editTeacher(t){
+  document.getElementById('t_TeacherID').value = t.TeacherID;
+  document.getElementById('t_Name').value = t.Name;
+  document.getElementById('t_Mobile').value = t.Mobile;
+  document.getElementById('t_Role').value = String(t.Role||'teacher').toLowerCase();
+  document.getElementById('t_AssignedClasses').value = t.AssignedClasses;
+  document.getElementById('t_Active').value = t.Active || 'Y';
+  showTab('teachers');
+}
+function saveTeacher(){
+  const teacher = {
+    TeacherID: document.getElementById('t_TeacherID').value.trim(),
+    Name: document.getElementById('t_Name').value.trim(),
+    Mobile: document.getElementById('t_Mobile').value.trim(),
+    Role: document.getElementById('t_Role').value,
+    AssignedClasses: document.getElementById('t_AssignedClasses').value.trim(),
+    Active: document.getElementById('t_Active').value
+  };
+  if (!teacher.Name || !teacher.Mobile){ showStatus('error','Name, Mobile നിർബന്ധമാണ്','msgTeacher'); return; }
+  if (!/^[6-9]\d{9}$/.test(teacher.Mobile)){ showStatus('error','Mobile 10 അക്കമുള്ള ശരിയായ നമ്പർ ആയിരിക്കണം','msgTeacher'); return; }
+  callApi({ action:"adminSaveTeacher", teacherId: session.teacherId, teacher }).then(res=>{
+    showStatus(res.success?'success':'error', esc(res.message), 'msgTeacher');
+    if (res.success){
+      const wasNew = !teacher.TeacherID;
+      clearTeacherForm(); loadAll();
+      if (wasNew && res.teacherId) setTimeout(()=>sendWhatsapp(res.teacherId), 500);
+    }
+  });
+}
+function sendWhatsapp(targetTeacherId){
+  callApi({ action:"adminGetTeacherWhatsappLink", teacherId: session.teacherId, targetTeacherId, baseUrl: location.origin + '/index.html' }).then(res=>{
+    if (!res.success){ showStatus('error', esc(res.message), 'msgTeacher'); return; }
+    window.open(res.waLink, '_blank');
+  });
+}
+
+// ---------- CLASSES ----------
+function renderClasses(){
+  const tbody = document.querySelector('#classesTable tbody');
+  tbody.innerHTML = allData.classes.map(c => `
+    <tr><td>${esc(c.ClassID)}</td><td>${esc(c.Standard)}</td><td>${esc(c.Division)}</td>
+      <td>${esc(c.Category)}</td><td>${esc(c.Active)}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="toggleClassActive('${esc(c.ClassID)}','${esc(c.Active)}')">${c.Active==='Y'?'Deactivate':'Activate'}</button></td>
+    </tr>`).join('');
+}
+function saveClass(){
+  const classItem = {
+    Standard: document.getElementById('c_Standard').value.trim(),
+    Division: document.getElementById('c_Division').value.trim(),
+    Category: document.getElementById('c_Category').value,
+    Active: 'Y'
+  };
+  if (!classItem.Standard || !classItem.Division){ showStatus('error','Standard, Division നിർബന്ധമാണ്','msgClass'); return; }
+  callApi({ action:"adminSaveClass", teacherId: session.teacherId, classItem }).then(res=>{
+    showStatus(res.success?'success':'error', esc(res.message), 'msgClass');
+    if (res.success){ document.getElementById('c_Standard').value=''; document.getElementById('c_Division').value=''; loadAll(); }
+  });
+}
+function toggleClassActive(classId, currentActive){
+  const c = allData.classes.find(x => x.ClassID === classId);
+  if (!c) return;
+  const classItem = { ClassID: c.ClassID, Standard: c.Standard, Division: c.Division, Category: c.Category, Active: currentActive==='Y'?'N':'Y' };
+  callApi({ action:"adminSaveClass", teacherId: session.teacherId, classItem }).then(res=>{
+    showStatus(res.success?'success':'error', esc(res.message), 'msgClass');
+    if (res.success) loadAll();
+  });
+}
+
+// ---------- HOLIDAYS ----------
+function renderHolidays(){
+  const tbody = document.querySelector('#holidaysTable tbody');
+  tbody.innerHTML = allData.holidays.map(h => `
+    <tr><td>${esc(h.Date)}</td><td>${esc(h.Reason)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteHoliday('${esc(h.Date)}')">നീക്കം ചെയ്യുക</button></td>
+    </tr>`).join('');
+}
+function saveHoliday(){
+  const holiday = { Date: document.getElementById('h_Date').value, Reason: document.getElementById('h_Reason').value.trim() };
+  if (!holiday.Date){ showStatus('error','Date തിരഞ്ഞെടുക്കുക','msgHoliday'); return; }
+  callApi({ action:"adminSaveHoliday", teacherId: session.teacherId, holiday }).then(res=>{
+    showStatus(res.success?'success':'error', esc(res.message), 'msgHoliday');
+    if (res.success){ document.getElementById('h_Date').value=''; document.getElementById('h_Reason').value=''; loadAll(); }
+  });
+}
+function deleteHoliday(dateStr){
+  if (!confirm(dateStr + ' നീക്കം ചെയ്യണോ?')) return;
+  callApi({ action:"adminDeleteHoliday", teacherId: session.teacherId, date: dateStr }).then(res=>{
+    showStatus(res.success?'success':'error', esc(res.message), 'msgHoliday');
+    if (res.success) loadAll();
+  });
+}
+
+// ---------- SETTINGS ----------
+let selectedMilkDays = [];
+let selectedEggDays = [];
+function buildWeekdayChips(){
+  document.getElementById('milkDaysGrid').innerHTML = WEEKDAYS.map(([en,ml]) =>
+    `<div class="day-chip" data-day="${en}" onclick="toggleDay('milk','${en}')">${ml}</div>`).join('');
+  document.getElementById('eggDaysGrid').innerHTML = WEEKDAYS.map(([en,ml]) =>
+    `<div class="day-chip" data-day="${en}" onclick="toggleDay('egg','${en}')">${ml}</div>`).join('');
+}
+function toggleDay(type, day){
+  const arr = type==='milk' ? selectedMilkDays : selectedEggDays;
+  const idx = arr.indexOf(day);
+  if (idx === -1) arr.push(day); else arr.splice(idx,1);
+  refreshDayChips();
+}
+function refreshDayChips(){
+  document.querySelectorAll('#milkDaysGrid .day-chip').forEach(el => el.classList.toggle('active', selectedMilkDays.indexOf(el.getAttribute('data-day'))!==-1));
+  document.querySelectorAll('#eggDaysGrid .day-chip').forEach(el => el.classList.toggle('active', selectedEggDays.indexOf(el.getAttribute('data-day'))!==-1));
+}
+function renderSettings(){
+  const cfg = allData.config;
+  document.getElementById('cfg_SchoolNameDisplay').innerText = cfg.SchoolName || '(സെറ്റ് ചെയ്തിട്ടില്ല)';
+  document.getElementById('cfg_HeadmasterName').value = cfg.HeadmasterName || '';
+  document.getElementById('cfg_Phone').value = cfg.Phone || '';
+  selectedMilkDays = String(cfg.MilkDays||'').split(',').map(s=>s.trim()).filter(Boolean);
+  selectedEggDays = String(cfg.EggDays||'').split(',').map(s=>s.trim()).filter(Boolean);
+  refreshDayChips();
+}
+function saveSettings(){
+  const config = {
+    HeadmasterName: document.getElementById('cfg_HeadmasterName').value.trim(),
+    Phone: document.getElementById('cfg_Phone').value.trim(),
+    MilkDays: selectedMilkDays.join(','),
+    EggDays: selectedEggDays.join(',')
+  };
+  callApi({ action:"adminUpdateConfig", teacherId: session.teacherId, config }).then(res=>{
+    showStatus(res.success?'success':'error', esc(res.message), 'msgSettings');
+    if (res.success) loadAll();
+  });
+}
+
+// ---------- DASHBOARD ----------
+function loadDashboard(){
+  callApi({ action:"adminDashboard", teacherId: session.teacherId }).then(res=>{
+    const area = document.getElementById('dashboardArea');
+    if (!res.success){ area.innerHTML = `<div class="msg msg-error">${esc(res.message)}</div>`; return; }
+
+    let html = `<div class="section-title" style="margin-top:0;">ഇന്ന് (${res.date})</div>`;
+    if (res.isHoliday){
+      html += `<div class="msg msg-info">ഇന്ന് അവധി ദിവസമാണ്${res.holidayReason?' - '+esc(res.holidayReason):''}</div>`;
+    }
+    html += `
+      <div class="grid2" style="margin-bottom:16px;">
+        <div class="card" style="background:#FCF3E0;margin-bottom:0;">
+          <div class="muted">ആകെ ഭക്ഷണം</div><div style="font-size:26px;font-weight:800;">${res.totals.total}</div>
+          <div class="muted">ആൺ ${res.totals.boys} · പെൺ ${res.totals.girls}</div>
+        </div>
+        <div class="card" style="background:#E8F3EC;margin-bottom:0;">
+          <div class="muted">പാൽ / മുട്ട</div><div style="font-size:26px;font-weight:800;">${res.totals.milk} / ${res.totals.egg}</div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <div class="section-title">✅ Submit ചെയ്തത് (${res.submittedClasses.length})</div>
+          <p class="muted">${res.submittedClasses.length ? res.submittedClasses.join(', ') : 'ഇല്ല'}</p>
+        </div>
+        <div>
+          <div class="section-title">⏳ Pending (${res.pendingClasses.length})</div>
+          <p class="muted">${res.pendingClasses.length ? res.pendingClasses.join(', ') : 'ഇല്ല - എല്ലാം സമർപ്പിച്ചു'}</p>
+        </div>
+      </div>
+      <div class="section-title">Standard അടിസ്ഥാനത്തിൽ (ഇന്ന്)</div>
+      <div class="table-scroll"><table><thead><tr><th>Standard</th><th>ആൺ</th><th>പെൺ</th><th>ആകെ</th><th>പാൽ</th><th>മുട്ട</th></tr></thead><tbody>
+        ${res.standardWise.map((r,i)=>`<tr class="${i===res.standardWise.length-1?'total-row':''}"><td>${esc(r.standard)}</td><td>${r.boys}</td><td>${r.girls}</td><td>${r.total}</td><td>${r.milk}</td><td>${r.egg}</td></tr>`).join('')}
+      </tbody></table></div>`;
+    area.innerHTML = html;
+  });
+}
+
+// ---------- HISTORY + CORRECTION ----------
+let historyRows = [];
+function loadHistory(){
+  const fromDate = document.getElementById('hist_fromDate').value;
+  const toDate = document.getElementById('hist_toDate').value;
+  if (!fromDate || !toDate){ showStatus('error','From/To Date തിരഞ്ഞെടുക്കുക','msgHistory'); return; }
+
+  callApi({ action:"getReport", reportType:"register", fromDate, toDate, teacherId: session.teacherId }).then(res=>{
+    if (!res.success){ showStatus('error', esc(res.message), 'msgHistory'); return; }
+    historyRows = res.rows;
+    const tbody = document.querySelector('#historyTable tbody');
+    if (!historyRows.length){ tbody.innerHTML = '<tr><td colspan="8">ഡാറ്റ ഇല്ല</td></tr>'; return; }
+    tbody.innerHTML = historyRows.map((r,i) => `
+      <tr><td>${esc(r.date)}</td><td>${esc(r.className)}</td><td>${r.boys}</td><td>${r.girls}</td><td>${r.total}</td><td>${r.milk}</td><td>${r.egg}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="openCorrection(${i})">Edit</button></td></tr>`).join('');
+  });
+}
+
+function openCorrection(i){
+  const r = historyRows[i];
+  // Need classId - fetch from allData.classes by matching className
+  const cls = allData.classes.find(c => (c.Standard + c.Division) === r.className);
+  const classId = cls ? cls.ClassID : r.className;
+
+  callApi({ action:"adminGetSubmission", teacherId: session.teacherId, date: r.date, classId }).then(res=>{
+    if (!res.success || !res.found){ showStatus('error', 'ആ entry വിശദാംശം കണ്ടെത്താനായില്ല', 'msgHistory'); return; }
+    const s = res.submission;
+    document.getElementById('corr_date').value = s.date;
+    document.getElementById('corr_classId').value = s.classId;
+    document.getElementById('corr_label').innerText = s.date + ' · ' + s.className;
+    document.getElementById('corr_boysAte').value = s.boysAte;
+    document.getElementById('corr_girlsAte').value = s.girlsAte;
+    document.getElementById('corr_milkBoys').value = s.milkBoys;
+    document.getElementById('corr_milkGirls').value = s.milkGirls;
+    document.getElementById('corr_eggBoys').value = s.eggBoys;
+    document.getElementById('corr_eggGirls').value = s.eggGirls;
+    document.getElementById('corr_remarks').value = s.remarks;
+    document.getElementById('correctionCard').classList.remove('hidden');
+    document.getElementById('correctionCard').scrollIntoView({behavior:'smooth'});
+  });
+}
+function closeCorrection(){
+  document.getElementById('correctionCard').classList.add('hidden');
+}
+function saveCorrection(){
+  const updates = {
+    boysAte: document.getElementById('corr_boysAte').value,
+    girlsAte: document.getElementById('corr_girlsAte').value,
+    milkBoys: document.getElementById('corr_milkBoys').value,
+    milkGirls: document.getElementById('corr_milkGirls').value,
+    eggBoys: document.getElementById('corr_eggBoys').value,
+    eggGirls: document.getElementById('corr_eggGirls').value,
+    remarks: document.getElementById('corr_remarks').value
+  };
+  const date = document.getElementById('corr_date').value;
+  const classId = document.getElementById('corr_classId').value;
+  callApi({ action:"adminCorrectSubmission", teacherId: session.teacherId, date, classId, updates }).then(res=>{
+    showStatus(res.success?'success':'error', esc(res.message), 'msgCorrection');
+    if (res.success){ closeCorrection(); loadHistory(); }
+  });
+}
+
+// ---------- LOGS ----------
+function loadLogs(){
+  callApi({ action:"adminGetLogs", teacherId: session.teacherId }).then(res=>{
+    const tbody = document.querySelector('#logsTable tbody');
+    if (!res.success){ tbody.innerHTML = `<tr><td colspan="4">${esc(res.message)}</td></tr>`; return; }
+    if (!res.logs.length){ tbody.innerHTML = '<tr><td colspan="4">Logs ഒന്നും ഇല്ല</td></tr>'; return; }
+    tbody.innerHTML = res.logs.map(l => `<tr><td>${esc(l.timestamp)}</td><td>${esc(l.user)}</td><td>${esc(l.action)}</td><td style="text-align:left;">${esc(l.details)}</td></tr>`).join('');
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WAJABA - ഉച്ചഭക്ഷണ കണക്ക്</title>
+
+<!-- PWA / Add to Home Screen support -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#153F35">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WAJABA">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700;800&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#153F35;
+    --forest-dark:#0E2C25;
+    --cream:#F7F4EC;
+    --gold:#D9A62E;
+    --gold-dark:#B5871E;
+    --white:#FFFFFF;
+    --red:#C0392B;
+    --gray:#6B7268;
+    --line:#E3DFD3;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    font-family:'Noto Sans Malayalam','DM Sans',sans-serif;
+    color:var(--forest-dark);
+    min-height:100vh;
+  }
+  .wrap{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+
+  header{
+    background:var(--forest);
+    color:var(--cream);
+    padding:22px 20px 26px;
+    border-radius:0 0 26px 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute; right:-30px; top:-30px;
+    width:140px; height:140px; border-radius:50%;
+    background:radial-gradient(circle, rgba(217,166,46,0.25), transparent 70%);
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand svg{width:34px;height:34px;flex-shrink:0;}
+  .brand-text{font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;letter-spacing:1px;color:var(--gold);}
+  .brand-sub{font-size:13px;opacity:0.75;margin-top:2px;}
+  .school-name{margin-top:14px;font-size:17px;font-weight:600;}
+  .today-line{font-size:13px;opacity:0.8;margin-top:4px;}
+
+  main{flex:1;padding:20px;padding-bottom:40px;}
+
+  .card{
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:22px 20px;
+    box-shadow:0 2px 14px rgba(21,63,53,0.06);
+    margin-bottom:16px;
+  }
+  .label{font-size:15px;font-weight:600;margin-bottom:8px;color:var(--forest-dark);}
+  input[type=text], input[type=tel], input[type=password]{
+    width:100%;
+    padding:16px 14px;
+    font-size:20px;
+    font-family:inherit;
+    border:2px solid var(--line);
+    border-radius:12px;
+    margin-bottom:14px;
+    background:var(--cream);
+    color:var(--forest-dark);
+  }
+  input:focus{outline:none;border-color:var(--gold);}
+
+  .btn{
+    display:block;width:100%;
+    padding:18px;
+    font-size:19px;
+    font-weight:700;
+    font-family:inherit;
+    border:none;border-radius:14px;
+    cursor:pointer;
+    text-align:center;
+  }
+  .btn-primary{background:var(--gold);color:var(--forest-dark);}
+  .btn-primary:active{background:var(--gold-dark);}
+  .btn-outline{background:transparent;border:2px solid var(--forest);color:var(--forest);margin-top:10px;}
+  .btn:disabled{opacity:0.45;cursor:not-allowed;}
+
+  .class-btn{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--cream);
+    border:2px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:12px;
+    font-size:19px;font-weight:700;
+    cursor:pointer;
+  }
+  .class-btn:active{border-color:var(--gold);}
+  .class-btn span.arrow{color:var(--gold-dark);font-size:22px;}
+
+  .counter-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 0; border-bottom:1px solid var(--line);
+  }
+  .counter-row:last-child{border-bottom:none;}
+  .counter-label{font-size:17px;font-weight:600;}
+  .counter{display:flex;align-items:center;gap:12px;}
+  .counter button{
+    width:42px;height:42px;border-radius:50%;
+    border:2px solid var(--forest);
+    background:var(--white);color:var(--forest);
+    font-size:22px;font-weight:700;
+    cursor:pointer;
+    line-height:1;
+  }
+  .counter input{
+    width:56px;text-align:center;
+    font-size:20px;font-weight:700;
+    padding:8px 4px;margin:0;
+    border:2px solid var(--line);border-radius:10px;
+  }
+  .section-title{
+    font-size:15px;font-weight:700;color:var(--gold-dark);
+    text-transform:uppercase;letter-spacing:0.5px;
+    margin:20px 0 6px;
+  }
+  .total-badge{
+    background:var(--forest);color:var(--cream);
+    border-radius:12px;padding:12px 16px;
+    display:flex;justify-content:space-between;align-items:center;
+    font-weight:700;font-size:17px;margin-top:6px;
+  }
+  textarea{
+    width:100%;padding:14px;font-size:16px;font-family:inherit;
+    border:2px solid var(--line);border-radius:12px;background:var(--cream);
+    min-height:70px;color:var(--forest-dark);
+  }
+  .msg{
+    padding:14px 16px;border-radius:12px;margin-bottom:14px;
+    font-size:15px;font-weight:600;
+  }
+  .msg-error{background:#FBEAE8;color:var(--red);}
+  .msg-success{background:#E8F3EC;color:var(--forest);}
+  .msg-info{background:#FCF3E0;color:var(--gold-dark);}
+
+  .center{text-align:center;}
+  .muted{color:var(--gray);font-size:14px;}
+  .hidden{display:none !important;}
+
+  .footer-note{
+    text-align:center;font-size:11px;color:var(--gray);
+    padding:20px 20px 30px;opacity:0.7;
+  }
+
+  .logout-link{
+    text-align:center;font-size:14px;color:var(--forest);
+    text-decoration:underline;margin-top:16px;cursor:pointer;
+  }
+
+  .spinner{
+    width:20px;height:20px;border:3px solid rgba(255,255,255,0.4);
+    border-top-color:var(--forest-dark);border-radius:50%;
+    display:inline-block;animation:spin 0.7s linear infinite;
+    vertical-align:middle;margin-right:8px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---- Meal row (food/milk/egg) with combined header+total ---- */
+  .meal-row{border-radius:14px;padding:12px 14px;margin-bottom:14px;border-left:5px solid var(--gold);background:#FBF8F0;}
+  .meal-row.milk-row{border-left-color:#2E6FB0;background:#EEF4FB;}
+  .meal-row.egg-row{border-left-color:#C97A2B;background:#FBF1E7;}
+  .meal-row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .meal-label{font-size:16px;font-weight:700;color:var(--forest-dark);display:flex;align-items:center;gap:6px;}
+  .meal-total-box{
+    background:var(--forest);color:var(--cream);border-radius:10px;
+    padding:6px 14px;font-weight:800;font-size:17px;min-width:40px;text-align:center;
+  }
+  .milk-row .meal-total-box{background:#2E6FB0;}
+  .egg-row .meal-total-box{background:#C97A2B;}
+  .star{color:#C0392B;font-size:15px;}
+  .meal-disabled-msg{font-size:14px;color:var(--gray);padding:8px 0;}
+  .counter-row.compact{padding:8px 0;}
+  .counter.compact button{width:36px;height:36px;font-size:19px;}
+  .counter.compact input{width:48px;font-size:18px;padding:6px 4px;}
+
+  /* ---- About / profile ---- */
+  .about-modal-backdrop{
+    position:fixed;inset:0;background:rgba(14,44,37,0.55);
+    display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;
+  }
+  .about-modal{background:var(--white);border-radius:18px;padding:24px;max-width:360px;width:100%;}
+  .about-modal h3{margin:0 0 12px;color:var(--forest-dark);}
+  .about-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .call-link{display:block;text-align:center;background:var(--gold);color:var(--forest-dark);
+    padding:14px;border-radius:12px;font-weight:700;text-decoration:none;margin-top:14px;}
+
+  /* ---- Terms overlay ---- */
+  .terms-overlay{
+    position:fixed;inset:0;background:var(--cream);z-index:2000;
+    display:flex;flex-direction:column;padding:24px;overflow-y:auto;
+  }
+  .terms-box{background:var(--white);border-radius:16px;padding:20px;flex:1;margin-bottom:16px;font-size:15px;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TERMS & CONDITIONS (shown once per device) -->
+  <div id="termsOverlay" class="terms-overlay hidden">
+    <h2 style="color:var(--forest-dark);">നിബന്ധനകൾ</h2>
+    <div class="terms-box" id="termsText">ലോഡ് ചെയ്യുന്നു...</div>
+    <button class="btn btn-primary" onclick="acceptTerms()">ഞാൻ അംഗീകരിക്കുന്നു, തുടരുക</button>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div id="aboutModal" class="about-modal-backdrop hidden" onclick="if(event.target===this) closeAbout()">
+    <div class="about-modal">
+      <h3>WAJABA</h3>
+      <div class="about-row"><span>Version</span><span id="about_version">-</span></div>
+      <div class="about-row"><span>School</span><span id="about_school">-</span></div>
+      <a href="#" id="about_callLink" class="call-link">📞 Technical Support: -</a>
+      <button class="btn btn-outline" style="margin-top:14px;" onclick="closeAbout()">അടയ്ക്കുക</button>
+      <button class="btn btn-outline" id="about_logoutBtn" style="margin-top:10px;color:var(--red);border-color:#F3C9C3;" onclick="doLogout()">ലോഗ്ഔട്ട്</button>
+    </div>
+  </div>
+
+
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="22" stroke="#D9A62E" stroke-width="2.5"/>
+        <path d="M14 20c0 6 4.5 11 10 11s10-5 10-11" stroke="#D9A62E" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M24 9v6M18 10l1.5 5M30 10l-1.5 5" stroke="#D9A62E" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="brand-text">WAJABA</div>
+      </div>
+    </div>
+    <div id="profileIcon" class="hidden" onclick="openAbout()" style="position:absolute;top:20px;right:20px;width:38px;height:38px;border-radius:50%;background:rgba(217,166,46,0.25);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;cursor:pointer;">👤</div>
+    <div class="school-name" id="schoolNameHeader">സ്കൂൾ ഉച്ചഭക്ഷണ കണക്ക്</div>
+    <div class="today-line" id="todayLine">തീയതി ലോഡ് ചെയ്യുന്നു...</div>
+  </header>
+
+  <main>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen">
+      <div class="card">
+        <div class="label">മൊബൈൽ നമ്പർ</div>
+        <input type="tel" id="loginMobile" placeholder="10 അക്ക നമ്പർ" maxlength="10" inputmode="numeric">
+        <div class="label">PIN</div>
+        <input type="password" id="loginPin" placeholder="4 അക്ക PIN" maxlength="6" inputmode="numeric">
+        <div id="loginError" class="msg msg-error hidden"></div>
+        <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">ലോഗിൻ ചെയ്യുക</button>
+      </div>
+      <p class="muted center">PIN മറന്നുപോയാൽ ഹെഡ്മാസ്റ്റർ / അഡ്മിനെ ബന്ധപ്പെടുക</p>
+    </div>
+
+    <!-- CLASS SELECT SCREEN -->
+    <div id="classScreen" class="hidden">
+      <div class="card">
+        <div class="label" id="welcomeText">സ്വാഗതം</div>
+        <p class="muted">നിങ്ങളുടെ ക്ലാസ് തിരഞ്ഞെടുക്കുക</p>
+        <div id="classList"></div>
+      </div>
+    </div>
+
+    <!-- ENTRY FORM SCREEN -->
+    <div id="entryScreen" class="hidden">
+      <div class="card center" id="classHeaderCard">
+        <div class="label" style="font-size:22px;margin-bottom:0;" id="selectedClassName">-</div>
+      </div>
+
+      <div id="statusMsgArea"></div>
+
+      <div class="card" id="formCard">
+        <div class="meal-row food-row">
+          <div class="meal-row-head">
+            <span class="meal-label">ഭക്ഷണം</span>
+            <span class="meal-total-box" id="totalFood">0</span>
+          </div>
+          <div class="counter-row compact">
+            <div class="counter-label">Boys</div>
+            <div class="counter compact">
+              <button onclick="adjust('boys',-1)">−</button>
+              <input type="text" id="boys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+              <button onclick="adjust('boys',1)">+</button>
+            </div>
+          </div>
+          <div class="counter-row compact">
+            <div class="counter-label">Girls</div>
+            <div class="counter compact">
+              <button onclick="adjust('girls',-1)">−</button>
+              <input type="text" id="girls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+              <button onclick="adjust('girls',1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="meal-row milk-row" id="milkSection">
+          <div class="meal-row-head">
+            <span class="meal-label">പാൽ <span id="milkStar" class="star hidden">⭐</span></span>
+            <span class="meal-total-box" id="totalMilk">0</span>
+          </div>
+          <div id="milkInputs">
+            <div class="counter-row compact">
+              <div class="counter-label">Boys</div>
+              <div class="counter compact">
+                <button onclick="adjust('milkBoys',-1)">−</button>
+                <input type="text" id="milkBoys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                <button onclick="adjust('milkBoys',1)">+</button>
+              </div>
+            </div>
+            <div class="counter-row compact">
+              <div class="counter-label">Girls</div>
+              <div class="counter compact">
+                <button onclick="adjust('milkGirls',-1)">−</button>
+                <input type="text" id="milkGirls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                <button onclick="adjust('milkGirls',1)">+</button>
+              </div>
+            </div>
+          </div>
+          <div id="milkDisabledMsg" class="meal-disabled-msg hidden">ഇന്ന് പാൽ ഇല്ല</div>
+        </div>
+
+        <div class="meal-row egg-row" id="eggSection">
+          <div class="meal-row-head">
+            <span class="meal-label">മുട്ട <span id="eggStar" class="star hidden">⭐</span></span>
+            <span class="meal-total-box" id="totalEgg">0</span>
+          </div>
+          <div id="eggInputs">
+            <div class="counter-row compact">
+              <div class="counter-label">Boys</div>
+              <div class="counter compact">
+                <button onclick="adjust('eggBoys',-1)">−</button>
+                <input type="text" id="eggBoys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                <button onclick="adjust('eggBoys',1)">+</button>
+              </div>
+            </div>
+            <div class="counter-row compact">
+              <div class="counter-label">Girls</div>
+              <div class="counter compact">
+                <button onclick="adjust('eggGirls',-1)">−</button>
+                <input type="text" id="eggGirls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                <button onclick="adjust('eggGirls',1)">+</button>
+              </div>
+            </div>
+          </div>
+          <div id="eggDisabledMsg" class="meal-disabled-msg hidden">ഇന്ന് മുട്ട ഇല്ല</div>
+        </div>
+
+        <div class="section-title">Remarks (ഐച്ഛികം)</div>
+        <textarea id="remarks" placeholder="എന്തെങ്കിലും കുറിപ്പ് ഉണ്ടെങ്കിൽ..."></textarea>
+
+        <button class="btn btn-primary" style="margin-top:20px;" id="submitBtn" onclick="confirmSubmit()">Submit ചെയ്യുക</button>
+      </div>
+
+      <div class="btn-outline center hidden" id="backToClassesBtn" onclick="backToClasses()" style="cursor:pointer;">← മറ്റൊരു ക്ലാസ്</div>
+    </div>
+
+    <a href="reports.html" id="reportsLink" class="hidden" style="display:block;text-align:center;font-size:14px;color:var(--forest);text-decoration:underline;margin-top:10px;">📊 റിപ്പോർട്ടുകൾ കാണുക</a>
+    <a href="admin.html" id="adminLink" class="hidden" style="display:block;text-align:center;font-size:14px;color:var(--forest);text-decoration:underline;margin-top:6px;">⚙️ Admin Panel</a>
+    <div id="historyLink" class="hidden" style="text-align:center;font-size:14px;color:var(--forest);text-decoration:underline;margin-top:6px;cursor:pointer;" onclick="showHistoryScreen()">🕐 History</div>
+    <div class="logout-link hidden" id="logoutLink" onclick="doLogout()">ലോഗ്ഔട്ട്</div>
+
+    <!-- HISTORY SCREEN -->
+    <div id="historyScreen" class="hidden">
+      <div class="card">
+        <div class="label">History (അവസാന 60 എൻട്രികൾ)</div>
+        <div id="historyArea"><p class="muted">ലോഡ് ചെയ്യുന്നു...</p></div>
+        <div class="btn-outline center" style="cursor:pointer;margin-top:14px;" onclick="hideHistoryScreen()">← തിരികെ</div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="footer-note" id="footerNote">WAJABA v1.0 · Noon Meal Management</div>
+</div>
+
+<script>
+// ============ CONFIG ============
+const API_URL = "https://script.google.com/macros/s/AKfycbyjqARLU3iPeLSWPUYmKgTZGfoie1DP7otoJTfiCBL9gIj1LadsI8_b9pS_oS7SkNlD/exec";
+
+let session = { teacherId:null, name:null, classes:[], selectedClass:null };
+let todayInfo = { milkMandatory:false, eggMandatory:false, isHoliday:false };
+let appInfo = {};
+
+// ============ API CALL HELPER ============
+function callApi(payload) {
+  return fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  }).then(r => r.json());
+}
+
+// ============ SERVICE WORKER (offline app-shell + installability) ============
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const d = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById('todayLine').innerText = d.toLocaleDateString('ml-IN', opts);
+
+  callApi({ action:"getTodayInfo" }).then(res => {
+    if (res.success) {
+      todayInfo = res;
+      if (res.schoolName) document.getElementById('schoolNameHeader').innerText = res.schoolName;
+    }
+  });
+
+  callApi({ action:"getAppInfo" }).then(res => {
+    if (!res.success) return;
+    appInfo = res;
+    document.getElementById('about_version').innerText = res.version;
+    document.getElementById('about_school').innerText = res.schoolName;
+    const callLink = document.getElementById('about_callLink');
+    if (res.developerPhone) {
+      callLink.href = 'tel:+91' + res.developerPhone;
+      callLink.innerText = '📞 Technical Support: ' + res.developerName + ' (' + res.developerPhone + ')';
+    }
+    document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName;
+
+    // Terms & Conditions gate - show once per device
+    const accepted = localStorage.getItem('wajaba_terms_accepted');
+    if (!accepted) {
+      document.getElementById('termsText').innerText = res.terms;
+      document.getElementById('termsOverlay').classList.remove('hidden');
+    }
+  });
+
+  const saved = localStorageSafeGet();
+  if (saved) {
+    session = saved;
+    showClassScreen();
+  }
+});
+
+function acceptTerms(){
+  localStorage.setItem('wajaba_terms_accepted', 'yes');
+  document.getElementById('termsOverlay').classList.add('hidden');
+}
+function openAbout(){ document.getElementById('aboutModal').classList.remove('hidden'); }
+function closeAbout(){ document.getElementById('aboutModal').classList.add('hidden'); }
+
+function clearZero(el){ if (el.value === '0') el.value = ''; }
+function restoreZero(el){ if (el.value.trim() === '') el.value = '0'; calcTotals(); }
+
+// in-memory fallback since localStorage may be unavailable in some contexts
+function localStorageSafeGet(){
+  try { const v = localStorage.getItem('wajaba_session'); return v ? JSON.parse(v) : null; }
+  catch(e){ return null; }
+}
+function localStorageSafeSet(obj){
+  try { localStorage.setItem('wajaba_session', JSON.stringify(obj)); } catch(e){}
+}
+function localStorageSafeClear(){
+  try { localStorage.removeItem('wajaba_session'); } catch(e){}
+}
+
+// ============ LOGIN ============
+function formatDateDisplay(isoDate){
+  // yyyy-MM-dd -> "17 Jul 2026"
+  const parts = String(isoDate).split('-');
+  if (parts.length !== 3) return isoDate;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mIdx = parseInt(parts[1],10) - 1;
+  return parseInt(parts[2],10) + ' ' + (months[mIdx]||parts[1]) + ' ' + parts[0];
+}
+
+function showHistoryScreen(){
+  document.getElementById('classScreen').classList.add('hidden');
+  document.getElementById('entryScreen').classList.add('hidden');
+  document.getElementById('historyScreen').classList.remove('hidden');
+  document.getElementById('historyArea').innerHTML = '<p class="muted">ലോഡ് ചെയ്യുന്നു...</p>';
+
+  callApi({ action:"teacherHistory", teacherId: session.teacherId }).then(res=>{
+    if (!res.success || !res.rows || res.rows.length===0){
+      document.getElementById('historyArea').innerHTML = '<p class="muted">ഇതുവരെ എൻട്രികൾ ഒന്നും ഇല്ല</p>';
+      return;
+    }
+    const rowsHtml = res.rows.map(r => `
+      <div style="padding:12px 0;border-bottom:1px solid var(--line);">
+        <div style="font-weight:700;">${formatDateDisplay(r.date)} · ${r.className}</div>
+        <div class="muted">ആൺ:${r.boys} പെൺ:${r.girls} ആകെ:${r.total} | പാൽ:${r.milk} | മുട്ട:${r.egg}</div>
+        ${r.remarks ? '<div class="muted">📝 '+r.remarks+'</div>' : ''}
+      </div>`).join('');
+    document.getElementById('historyArea').innerHTML = rowsHtml;
+  });
+}
+function hideHistoryScreen(){
+  document.getElementById('historyScreen').classList.add('hidden');
+  showClassScreen();
+}
+
+function doLogin() {
+  const mobile = document.getElementById('loginMobile').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.classList.add('hidden');
+
+  if (!mobile || !pin) {
+    errEl.innerText = "മൊബൈൽ നമ്പറും PIN-ഉം നൽകുക";
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>ലോഗിൻ ചെയ്യുന്നു...';
+
+  callApi({ action:"login", mobile, pin }).then(res => {
+    btn.disabled = false;
+    btn.innerText = "ലോഗിൻ ചെയ്യുക";
+    if (res.success) {
+      session = { teacherId: res.teacherId, name: res.name, role: res.role, classes: res.classes };
+      localStorageSafeSet(session);
+      showClassScreen();
+    } else {
+      errEl.innerText = res.message || "ലോഗിൻ പരാജയപ്പെട്ടു";
+      errEl.classList.remove('hidden');
+    }
+  }).catch(() => {
+    btn.disabled = false;
+    btn.innerText = "ലോഗിൻ ചെയ്യുക";
+    errEl.innerText = "കണക്ഷൻ പിശക്. വീണ്ടും ശ്രമിക്കുക";
+    errEl.classList.remove('hidden');
+  });
+}
+
+function doLogout(){
+  localStorageSafeClear();
+  session = { teacherId:null, name:null, classes:[], selectedClass:null };
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('classScreen').classList.add('hidden');
+  document.getElementById('entryScreen').classList.add('hidden');
+  document.getElementById('historyScreen').classList.add('hidden');
+  document.getElementById('historyLink').classList.add('hidden');
+  document.getElementById('logoutLink').classList.add('hidden');
+  document.getElementById('reportsLink').classList.add('hidden');
+  document.getElementById('adminLink').classList.add('hidden');
+  document.getElementById('profileIcon').classList.add('hidden');
+  closeAbout();
+  document.getElementById('loginMobile').value = '';
+  document.getElementById('loginPin').value = '';
+}
+
+// ============ CLASS SCREEN ============
+function showClassScreen() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('entryScreen').classList.add('hidden');
+  document.getElementById('classScreen').classList.remove('hidden');
+  document.getElementById('logoutLink').classList.remove('hidden');
+  document.getElementById('welcomeText').innerText = "സ്വാഗതം, " + session.name;
+
+  const reportRoles = ['clerk','headmaster','admin'];
+  const myRole = String(session.role || '').trim().toLowerCase();
+  document.getElementById('reportsLink').classList.toggle('hidden', reportRoles.indexOf(myRole) === -1);
+  document.getElementById('adminLink').classList.toggle('hidden', myRole !== 'admin');
+  document.getElementById('historyLink').classList.remove('hidden');
+  document.getElementById('profileIcon').classList.remove('hidden');
+  document.getElementById('backToClassesBtn').classList.toggle('hidden', session.classes.length <= 1);
+
+  if (session.classes.length === 1) {
+    selectClass(session.classes[0]);
+    return;
+  }
+
+  const list = document.getElementById('classList');
+  list.innerHTML = '';
+  session.classes.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'class-btn';
+    div.innerHTML = '<span>' + c.className + '</span><span class="arrow">→</span>';
+    div.onclick = () => selectClass(c);
+    list.appendChild(div);
+  });
+}
+
+function backToClasses(){
+  document.getElementById('entryScreen').classList.add('hidden');
+  showClassScreen();
+}
+
+// ============ ENTRY SCREEN ============
+function selectClass(c) {
+  session.selectedClass = c;
+  document.getElementById('classScreen').classList.add('hidden');
+  document.getElementById('entryScreen').classList.remove('hidden');
+  document.getElementById('selectedClassName').innerText = c.className;
+
+  document.getElementById('milkStar').classList.toggle('hidden', !todayInfo.milkMandatory);
+  document.getElementById('eggStar').classList.toggle('hidden', !todayInfo.eggMandatory);
+  document.getElementById('milkInputs').classList.toggle('hidden', !todayInfo.milkMandatory);
+  document.getElementById('milkDisabledMsg').classList.toggle('hidden', !!todayInfo.milkMandatory);
+  document.getElementById('eggInputs').classList.toggle('hidden', !todayInfo.eggMandatory);
+  document.getElementById('eggDisabledMsg').classList.toggle('hidden', !!todayInfo.eggMandatory);
+  if (!todayInfo.milkMandatory){ document.getElementById('milkBoys').value=0; document.getElementById('milkGirls').value=0; }
+  if (!todayInfo.eggMandatory){ document.getElementById('eggBoys').value=0; document.getElementById('eggGirls').value=0; }
+
+  const statusArea = document.getElementById('statusMsgArea');
+  const formCard = document.getElementById('formCard');
+  statusArea.innerHTML = '';
+
+  if (todayInfo.isHoliday) {
+    statusArea.innerHTML = '<div class="msg msg-info">ഇന്ന് അവധി ദിവസമാണ്' +
+      (todayInfo.holidayReason ? (' - ' + todayInfo.holidayReason) : '') + '</div>';
+    formCard.classList.add('hidden');
+    return;
+  }
+
+  formCard.classList.add('hidden');
+  statusArea.innerHTML = '<div class="msg msg-info"><span class="spinner" style="border-top-color:#B5871E;"></span>പരിശോധിക്കുന്നു...</div>';
+
+  callApi({ action:"checkSubmitted", classId: c.classId, date: todayInfo.date }).then(res => {
+    if (res.success && res.alreadySubmitted) {
+      const d = res.data;
+      statusArea.innerHTML = '<div class="msg msg-success">ഇന്നത്തെ കണക്ക് നൽകിക്കഴിഞ്ഞു ✓<br>' +
+        'ആകെ ഭക്ഷണം: ' + d.totalAte + ' | പാൽ: ' + d.milkTotal + ' | മുട്ട: ' + d.eggTotal +
+        '<br><span class="muted">തിരുത്തേണ്ടതുണ്ടെങ്കിൽ അഡ്മിനെ ബന്ധപ്പെടുക</span></div>';
+      formCard.classList.add('hidden');
+    } else {
+      statusArea.innerHTML = '';
+      formCard.classList.remove('hidden');
+      resetForm();
+    }
+  });
+}
+
+function resetForm(){
+  ['boys','girls','milkBoys','milkGirls','eggBoys','eggGirls'].forEach(id => {
+    document.getElementById(id).value = 0;
+  });
+  document.getElementById('remarks').value = '';
+  calcTotals();
+}
+
+function adjust(id, delta) {
+  const el = document.getElementById(id);
+  let v = parseInt(el.value) || 0;
+  v = Math.max(0, v + delta);
+  el.value = v;
+  calcTotals();
+}
+
+function calcTotals() {
+  const val = id => parseInt(document.getElementById(id).value) || 0;
+  document.getElementById('totalFood').innerText = val('boys') + val('girls');
+  document.getElementById('totalMilk').innerText = val('milkBoys') + val('milkGirls');
+  document.getElementById('totalEgg').innerText = val('eggBoys') + val('eggGirls');
+}
+
+function confirmSubmit() {
+  const val = id => parseInt(document.getElementById(id).value) || 0;
+  const totalFood = val('boys') + val('girls');
+
+  if (totalFood === 0) {
+    alert("ഭക്ഷണം കഴിച്ചവരുടെ എണ്ണം നൽകുക");
+    return;
+  }
+  if (todayInfo.milkMandatory && (val('milkBoys') + val('milkGirls')) === 0) {
+    alert("ഇന്ന് പാൽ നിർബന്ധമാണ്. പാൽ കണക്ക് നൽകുക");
+    return;
+  }
+  if (todayInfo.eggMandatory && (val('eggBoys') + val('eggGirls')) === 0) {
+    alert("ഇന്ന് മുട്ട നിർബന്ധമാണ്. മുട്ട കണക്ക് നൽകുക");
+    return;
+  }
+
+  if (!confirm("കണക്ക് Submit ചെയ്യണോ? Submit ചെയ്ത ശേഷം തിരുത്താൻ കഴിയില്ല.")) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Submit ചെയ്യുന്നു...';
+
+  callApi({
+    action: "submitEntry",
+    date: todayInfo.date,
+    classId: session.selectedClass.classId,
+    teacherId: session.teacherId,
+    teacherName: session.name,
+    boysAte: val('boys'), girlsAte: val('girls'),
+    milkBoys: val('milkBoys'), milkGirls: val('milkGirls'),
+    eggBoys: val('eggBoys'), eggGirls: val('eggGirls'),
+    remarks: document.getElementById('remarks').value.trim()
+  }).then(res => {
+    btn.disabled = false;
+    btn.innerText = "Submit ചെയ്യുക";
+    if (res.success) {
+      document.getElementById('formCard').classList.add('hidden');
+      document.getElementById('statusMsgArea').innerHTML =
+        '<div class="msg msg-success">✓ ' + res.message + '</div>';
+    } else {
+      alert(res.message || "പിശക് സംഭവിച്ചു");
+    }
+  }).catch(() => {
+    btn.disabled = false;
+    btn.innerText = "Submit ചെയ്യുക";
+    alert("കണക്ഷൻ പിശക്. വീണ്ടും ശ്രമിക്കുക");
+  });
+}
+</script>
+</body>
+</html>
