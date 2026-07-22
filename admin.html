@@ -23,7 +23,7 @@
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);font-family:'Noto Sans Malayalam','DM Sans',sans-serif;color:var(--forest-dark);}
   .wrap{max-width:900px;margin:0 auto;padding-bottom:50px;}
-  header{background:var(--forest);color:var(--cream);padding:20px 24px;border-radius:0 0 22px 22px;}
+  header{background:var(--forest);color:var(--cream);padding:20px 24px;border-radius:0 0 22px 22px;position:relative;}
   .brand{display:flex;align-items:center;gap:10px;}
   .brand svg{width:30px;height:30px;}
   .brand-text{font-family:'DM Sans',sans-serif;font-weight:700;font-size:20px;color:var(--gold);letter-spacing:1px;}
@@ -74,6 +74,27 @@
   .section-title{font-size:15px;font-weight:700;color:var(--gold-dark);margin:16px 0 8px;}
   .logout-link{text-align:right;font-size:13px;color:var(--forest);text-decoration:underline;cursor:pointer;margin-bottom:6px;}
   .nav-link{font-size:14px;color:var(--forest);text-decoration:underline;}
+
+  /* ---- About modal (shared pattern with teacher app) ---- */
+  .about-modal-backdrop{
+    position:fixed;inset:0;background:rgba(14,44,37,0.55);
+    display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;
+  }
+  .about-modal{background:var(--white);border-radius:18px;padding:24px;max-width:360px;width:100%;}
+  .about-modal h3{margin:0 0 12px;color:var(--forest-dark);}
+  .about-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .call-link{display:block;text-align:center;background:var(--gold);color:var(--forest-dark);
+    padding:14px;border-radius:12px;font-weight:700;text-decoration:none;margin-top:14px;}
+
+  /* ---- Consistent nav button row ---- */
+  .nav-btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:4px 0 16px;}
+  .nav-btn{
+    flex:1 1 auto;min-width:100px;text-align:center;
+    padding:11px 14px;border-radius:10px;border:2px solid var(--forest);
+    color:var(--forest);font-size:13px;font-weight:700;
+    text-decoration:none;cursor:pointer;background:transparent;
+  }
+  .nav-btn:active{background:rgba(21,63,53,0.08);}
 </style>
 </head>
 <body>
@@ -88,7 +109,20 @@
       <div class="brand-text">WAJABA</div>
     </div>
     <div class="page-title">Admin Panel</div>
+    <div id="profileIcon" class="hidden" onclick="openAbout()" style="position:absolute;top:20px;right:20px;width:38px;height:38px;border-radius:50%;background:rgba(217,166,46,0.25);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;cursor:pointer;z-index:5;">👤</div>
   </header>
+
+  <!-- ABOUT MODAL -->
+  <div id="aboutModal" class="about-modal-backdrop hidden" onclick="if(event.target===this) closeAbout()">
+    <div class="about-modal">
+      <h3>WAJABA</h3>
+      <div class="about-row"><span>Version</span><span id="about_version">-</span></div>
+      <div class="about-row"><span>School</span><span id="about_school">-</span></div>
+      <a href="#" id="about_callLink" class="call-link">📞 Technical Support: -</a>
+      <button class="btn btn-outline" style="margin-top:14px;" onclick="closeAbout()">അടയ്ക്കുക</button>
+      <button class="btn btn-outline" style="margin-top:10px;color:var(--red);border-color:#F3C9C3;" onclick="doLogout()">ലോഗ്ഔട്ട്</button>
+    </div>
+  </div>
 
   <main>
     <!-- LOGIN -->
@@ -106,12 +140,9 @@
 
     <!-- ADMIN SCREEN -->
     <div id="adminScreen" class="hidden">
-      <div class="btn-row" style="justify-content:space-between;margin-bottom:10px;">
-        <div>
-          <a href="index.html" class="nav-link">📝 എൻട്രി</a> &nbsp;|&nbsp;
-          <a href="reports.html" class="nav-link">📊 റിപ്പോർട്ടുകൾ</a>
-        </div>
-        <div class="logout-link" onclick="doLogout()">ലോഗ്ഔട്ട് (<span id="userNameTag"></span>)</div>
+      <div class="nav-btn-row">
+        <a href="index.html" class="nav-btn">📝 എൻട്രി</a>
+        <a href="reports.html" class="nav-btn">📊 റിപ്പോർട്ടുകൾ</a>
       </div>
 
       <div class="tab-bar">
@@ -152,7 +183,7 @@
             <option value="headmaster">headmaster</option>
             <option value="admin">admin</option>
           </select>
-          <p class="muted" style="margin-top:-6px;">PIN സ്വയമേവ generate ചെയ്യും - ചുവടെയുള്ള "📲 Send" ബട്ടൺ വഴി WhatsApp-ൽ അയക്കാം</p>
+          <p class="muted" style="margin-top:-6px;">PIN സിസ്റ്റം generate ചെയ്യും ടീച്ചറുടെ പേരിനു നേരെയുള്ള "📲 Send" ബട്ടൺ വഴി WhatsApp-ൽ അയക്കാം</p>
           <div class="label">Assigned Classes (comma-separated ClassID, അല്ലെങ്കിൽ "full")</div>
           <input type="text" id="t_AssignedClasses" placeholder="1-A,1-B അല്ലെങ്കിൽ full">
           <div id="msgTeacher"></div>
@@ -173,15 +204,21 @@
       <div id="tab-classes" class="tab-content hidden">
         <div class="card">
           <div class="table-scroll"><table id="classesTable"><thead>
-            <tr><th>ClassID</th><th>Standard</th><th>Division</th><th>Category</th><th>Active</th><th></th></tr>
+            <tr><th>ClassID</th><th>Standard</th><th>Division</th><th>Category</th><th>ആകെ (ആൺ/പെൺ)</th><th>Active</th><th></th><th></th></tr>
           </thead><tbody></tbody></table></div>
         </div>
         <div class="card">
-          <div class="section-title">പുതിയ ക്ലാസ് ചേർക്കുക</div>
+          <div class="section-title">പുതിയ ക്ലാസ് ചേർക്കുക / Edit ചെയ്യുക</div>
+          <input type="hidden" id="c_ClassID">
           <div class="grid2">
             <div><div class="label">Standard</div><input type="text" id="c_Standard" placeholder="1, LKG, etc"></div>
             <div><div class="label">Division</div><input type="text" id="c_Division" placeholder="A"></div>
           </div>
+          <div class="grid2">
+            <div><div class="label">ആകെ ആൺകുട്ടികൾ (ഐച്ഛികം)</div><input type="text" id="c_TotalBoys" inputmode="numeric" placeholder="0"></div>
+            <div><div class="label">ആകെ പെൺകുട്ടികൾ (ഐച്ഛികം)</div><input type="text" id="c_TotalGirls" inputmode="numeric" placeholder="0"></div>
+          </div>
+          <p class="muted" style="margin-top:-6px;">ഇത് നൽകിയാൽ, ടീച്ചർ ഇതിലും കൂടുതൽ എണ്ണം entry ചെയ്യുമ്പോൾ ഒരു മുന്നറിയിപ്പ് കാണിക്കും</p>
           <div id="msgClass"></div>
           <div class="grid2">
             <div><div class="label">Category</div>
@@ -193,9 +230,10 @@
               </select>
             </div>
             <div style="align-self:flex-end;">
-              <button class="btn btn-primary" style="width:100%;" onclick="saveClass()">ചേർക്കുക</button>
+              <button class="btn btn-primary" style="width:100%;" onclick="saveClass()">സേവ് ചെയ്യുക</button>
             </div>
           </div>
+          <button class="btn btn-outline btn-sm" onclick="clearClassForm()">+ പുതിയ ക്ലാസ്</button>
         </div>
       </div>
 
@@ -204,8 +242,7 @@
         <div class="card">
           <div class="section-title">സ്കൂൾ വിവരങ്ങൾ</div>
           <div class="label">School Name</div>
-          <div style="padding:13px;background:var(--line);border-radius:10px;margin-bottom:6px;color:var(--gray);" id="cfg_SchoolNameDisplay">-</div>
-          <p class="muted" style="margin-top:-2px;">ഇത് മാറ്റാൻ ഡെവലപ്പറെ ബന്ധപ്പെടുക</p>
+          <div style="padding:13px;background:var(--line);border-radius:10px;margin-bottom:14px;color:var(--gray);" id="cfg_SchoolNameDisplay">-</div>
           <div class="label">Headmaster Name</div><input type="text" id="cfg_HeadmasterName">
           <div class="label">Phone</div><input type="text" id="cfg_Phone">
 
@@ -299,6 +336,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbyjqARLU3iPeLSWPUYmKgTZGfoie1DP7otoJTfiCBL9gIj1LadsI8_b9pS_oS7SkNlD/exec";
 let session = { teacherId:null, name:null, role:null };
 let allData = { teachers:[], classes:[], holidays:[], config:{} };
+let appInfo = {};
 const WEEKDAYS = [['Mon','തിങ്കൾ'],['Tue','ചൊവ്വ'],['Wed','ബുധൻ'],['Thu','വ്യാഴം'],['Fri','വെള്ളി'],['Sat','ശനി'],['Sun','ഞായർ']];
 
 function callApi(payload){
@@ -319,13 +357,25 @@ function showStatus(type, text, targetId){
 document.addEventListener('DOMContentLoaded', function(){
   buildWeekdayChips();
   callApi({ action:"getAppInfo" }).then(res=>{
-    if (res.success) document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName + (res.developerPhone ? ' · Support: ' + res.developerPhone : '');
+    if (!res.success) return;
+    appInfo = res;
+    document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName + ' · ' + res.developerName;
+    document.getElementById('about_version').innerText = res.version;
+    document.getElementById('about_school').innerText = res.schoolName;
+    const callLink = document.getElementById('about_callLink');
+    callLink.innerText = res.developerPhone
+      ? '📞 Technical Support: ' + res.developerName + ' (' + res.developerPhone + ')'
+      : '📞 Technical Support: ' + res.developerName;
+    if (res.developerPhone) callLink.href = 'tel:+91' + res.developerPhone;
   });
   const saved = localGet();
   if (saved && String(saved.role||'').trim().toLowerCase() === 'admin'){
     session = saved; showAdminScreen();
   }
 });
+
+function openAbout(){ document.getElementById('aboutModal').classList.remove('hidden'); }
+function closeAbout(){ document.getElementById('aboutModal').classList.add('hidden'); }
 
 function doLogin(){
   const mobile = document.getElementById('loginMobile').value.trim();
@@ -357,12 +407,14 @@ function doLogout(){
   session = { teacherId:null, name:null, role:null };
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('adminScreen').classList.add('hidden');
+  document.getElementById('profileIcon').classList.add('hidden');
+  closeAbout();
 }
 
 function showAdminScreen(){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('adminScreen').classList.remove('hidden');
-  document.getElementById('userNameTag').innerText = session.name;
+  document.getElementById('profileIcon').classList.remove('hidden');
   loadAll();
 }
 
@@ -423,18 +475,35 @@ function saveTeacher(){
   if (!teacher.Name || !teacher.Mobile){ showStatus('error','Name, Mobile നിർബന്ധമാണ്','msgTeacher'); return; }
   if (!/^[6-9]\d{9}$/.test(teacher.Mobile)){ showStatus('error','Mobile 10 അക്കമുള്ള ശരിയായ നമ്പർ ആയിരിക്കണം','msgTeacher'); return; }
   callApi({ action:"adminSaveTeacher", teacherId: session.teacherId, teacher }).then(res=>{
-    showStatus(res.success?'success':'error', esc(res.message), 'msgTeacher');
     if (res.success){
       const wasNew = !teacher.TeacherID;
+      const newId = res.teacherId;
       clearTeacherForm(); loadAll();
-      if (wasNew && res.teacherId) setTimeout(()=>sendWhatsapp(res.teacherId), 500);
+      if (wasNew && newId) {
+        document.getElementById('msgTeacher').innerHTML =
+          '<div class="msg msg-success">Teacher ചേർത്തു ✓ &nbsp; ' +
+          '<button class="btn btn-primary btn-sm" onclick="sendWhatsapp(\'' + newId + '\')">📲 Login വിവരം WhatsApp-ൽ അയക്കുക</button></div>';
+      } else {
+        showStatus('success', esc(res.message), 'msgTeacher');
+      }
+    } else {
+      showStatus('error', esc(res.message), 'msgTeacher');
     }
   });
 }
 function sendWhatsapp(targetTeacherId){
+  // Open the tab immediately (synchronous, direct user-gesture) to avoid popup blockers,
+  // then redirect it once the server has generated the WhatsApp link.
+  const w = window.open('', '_blank');
+  if (w) { w.document.write('തയ്യാറാക്കുന്നു...'); }
   callApi({ action:"adminGetTeacherWhatsappLink", teacherId: session.teacherId, targetTeacherId, baseUrl: location.origin + '/index.html' }).then(res=>{
-    if (!res.success){ showStatus('error', esc(res.message), 'msgTeacher'); return; }
-    window.open(res.waLink, '_blank');
+    if (!res.success){
+      showStatus('error', esc(res.message), 'msgTeacher');
+      if (w) w.close();
+      return;
+    }
+    if (w) w.location = res.waLink;
+    else window.open(res.waLink, '_blank'); // popup was blocked outright - fallback
   });
 }
 
@@ -443,27 +512,45 @@ function renderClasses(){
   const tbody = document.querySelector('#classesTable tbody');
   tbody.innerHTML = allData.classes.map(c => `
     <tr><td>${esc(c.ClassID)}</td><td>${esc(c.Standard)}</td><td>${esc(c.Division)}</td>
-      <td>${esc(c.Category)}</td><td>${esc(c.Active)}</td>
+      <td>${esc(c.Category)}</td><td>${esc(c.TotalBoys)||0} / ${esc(c.TotalGirls)||0}</td><td>${esc(c.Active)}</td>
+      <td><button class="btn btn-outline btn-sm" onclick='editClass(${JSON.stringify(c).replace(/'/g,"&apos;")})'>Edit</button></td>
       <td><button class="btn btn-outline btn-sm" onclick="toggleClassActive('${esc(c.ClassID)}','${esc(c.Active)}')">${c.Active==='Y'?'Deactivate':'Activate'}</button></td>
     </tr>`).join('');
 }
+function clearClassForm(){
+  ['c_ClassID','c_Standard','c_Division','c_TotalBoys','c_TotalGirls'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('c_Category').value = 'LP';
+}
+function editClass(c){
+  document.getElementById('c_ClassID').value = c.ClassID;
+  document.getElementById('c_Standard').value = c.Standard;
+  document.getElementById('c_Division').value = c.Division;
+  document.getElementById('c_Category').value = c.Category || 'LP';
+  document.getElementById('c_TotalBoys').value = c.TotalBoys || '';
+  document.getElementById('c_TotalGirls').value = c.TotalGirls || '';
+  showTab('classes');
+}
 function saveClass(){
   const classItem = {
+    ClassID: document.getElementById('c_ClassID').value.trim(),
     Standard: document.getElementById('c_Standard').value.trim(),
     Division: document.getElementById('c_Division').value.trim(),
     Category: document.getElementById('c_Category').value,
+    TotalBoys: document.getElementById('c_TotalBoys').value.trim(),
+    TotalGirls: document.getElementById('c_TotalGirls').value.trim(),
     Active: 'Y'
   };
   if (!classItem.Standard || !classItem.Division){ showStatus('error','Standard, Division നിർബന്ധമാണ്','msgClass'); return; }
   callApi({ action:"adminSaveClass", teacherId: session.teacherId, classItem }).then(res=>{
     showStatus(res.success?'success':'error', esc(res.message), 'msgClass');
-    if (res.success){ document.getElementById('c_Standard').value=''; document.getElementById('c_Division').value=''; loadAll(); }
+    if (res.success){ clearClassForm(); loadAll(); }
   });
 }
 function toggleClassActive(classId, currentActive){
   const c = allData.classes.find(x => x.ClassID === classId);
   if (!c) return;
-  const classItem = { ClassID: c.ClassID, Standard: c.Standard, Division: c.Division, Category: c.Category, Active: currentActive==='Y'?'N':'Y' };
+  const classItem = { ClassID: c.ClassID, Standard: c.Standard, Division: c.Division, Category: c.Category,
+    TotalBoys: c.TotalBoys, TotalGirls: c.TotalGirls, Active: currentActive==='Y'?'N':'Y' };
   callApi({ action:"adminSaveClass", teacherId: session.teacherId, classItem }).then(res=>{
     showStatus(res.success?'success':'error', esc(res.message), 'msgClass');
     if (res.success) loadAll();

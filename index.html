@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>WAJABA - ഉച്ചഭക്ഷണ കണക്ക്</title>
+<title>WAJABA - Mid Day Meal Management</title>
 
 <!-- PWA / Add to Home Screen support -->
 <link rel="manifest" href="manifest.json">
@@ -52,6 +52,7 @@
     position:absolute; right:-30px; top:-30px;
     width:140px; height:140px; border-radius:50%;
     background:radial-gradient(circle, rgba(217,166,46,0.25), transparent 70%);
+    pointer-events:none;
   }
   .brand{display:flex;align-items:center;gap:10px;}
   .brand svg{width:34px;height:34px;flex-shrink:0;}
@@ -213,6 +214,16 @@
     display:flex;flex-direction:column;padding:24px;overflow-y:auto;
   }
   .terms-box{background:var(--white);border-radius:16px;padding:20px;flex:1;margin-bottom:16px;font-size:15px;line-height:1.7;}
+
+  /* ---- Consistent nav button row (Reports/Admin/History) ---- */
+  .nav-btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0;}
+  .nav-btn{
+    flex:1 1 auto;min-width:100px;text-align:center;
+    padding:11px 14px;border-radius:10px;border:2px solid var(--forest);
+    color:var(--forest);font-size:13px;font-weight:700;
+    text-decoration:none;cursor:pointer;background:transparent;
+  }
+  .nav-btn:active{background:rgba(21,63,53,0.08);}
 </style>
 </head>
 <body>
@@ -249,7 +260,7 @@
         <div class="brand-text">WAJABA</div>
       </div>
     </div>
-    <div id="profileIcon" class="hidden" onclick="openAbout()" style="position:absolute;top:20px;right:20px;width:38px;height:38px;border-radius:50%;background:rgba(217,166,46,0.25);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;cursor:pointer;">👤</div>
+    <div id="profileIcon" class="hidden" onclick="openAbout()" style="position:absolute;top:20px;right:20px;width:38px;height:38px;border-radius:50%;background:rgba(217,166,46,0.25);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;cursor:pointer;z-index:5;">👤</div>
     <div class="school-name" id="schoolNameHeader">സ്കൂൾ ഉച്ചഭക്ഷണ കണക്ക്</div>
     <div class="today-line" id="todayLine">തീയതി ലോഡ് ചെയ്യുന്നു...</div>
   </header>
@@ -296,7 +307,7 @@
             <div class="counter-label">Boys</div>
             <div class="counter compact">
               <button onclick="adjust('boys',-1)">−</button>
-              <input type="text" id="boys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+              <input type="text" id="boys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this);checkRollLimit('boys','boys')">
               <button onclick="adjust('boys',1)">+</button>
             </div>
           </div>
@@ -304,7 +315,7 @@
             <div class="counter-label">Girls</div>
             <div class="counter compact">
               <button onclick="adjust('girls',-1)">−</button>
-              <input type="text" id="girls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+              <input type="text" id="girls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this);checkRollLimit('girls','girls')">
               <button onclick="adjust('girls',1)">+</button>
             </div>
           </div>
@@ -320,7 +331,7 @@
               <div class="counter-label">Boys</div>
               <div class="counter compact">
                 <button onclick="adjust('milkBoys',-1)">−</button>
-                <input type="text" id="milkBoys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                <input type="text" id="milkBoys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this);checkRollLimit('milkBoys','boys')">
                 <button onclick="adjust('milkBoys',1)">+</button>
               </div>
             </div>
@@ -328,7 +339,7 @@
               <div class="counter-label">Girls</div>
               <div class="counter compact">
                 <button onclick="adjust('milkGirls',-1)">−</button>
-                <input type="text" id="milkGirls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                <input type="text" id="milkGirls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this);checkRollLimit('milkGirls','girls')">
                 <button onclick="adjust('milkGirls',1)">+</button>
               </div>
             </div>
@@ -346,7 +357,7 @@
               <div class="counter-label">Boys</div>
               <div class="counter compact">
                 <button onclick="adjust('eggBoys',-1)">−</button>
-                <input type="text" id="eggBoys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                <input type="text" id="eggBoys" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this);checkRollLimit('eggBoys','boys')">
                 <button onclick="adjust('eggBoys',1)">+</button>
               </div>
             </div>
@@ -354,7 +365,7 @@
               <div class="counter-label">Girls</div>
               <div class="counter compact">
                 <button onclick="adjust('eggGirls',-1)">−</button>
-                <input type="text" id="eggGirls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                <input type="text" id="eggGirls" value="0" inputmode="numeric" oninput="calcTotals()" onfocus="clearZero(this)" onblur="restoreZero(this);checkRollLimit('eggGirls','girls')">
                 <button onclick="adjust('eggGirls',1)">+</button>
               </div>
             </div>
@@ -362,7 +373,7 @@
           <div id="eggDisabledMsg" class="meal-disabled-msg hidden">ഇന്ന് മുട്ട ഇല്ല</div>
         </div>
 
-        <div class="section-title">Remarks (ഐച്ഛികം)</div>
+        <div class="section-title">Remarks</div>
         <textarea id="remarks" placeholder="എന്തെങ്കിലും കുറിപ്പ് ഉണ്ടെങ്കിൽ..."></textarea>
 
         <button class="btn btn-primary" style="margin-top:20px;" id="submitBtn" onclick="confirmSubmit()">Submit ചെയ്യുക</button>
@@ -371,17 +382,18 @@
       <div class="btn-outline center hidden" id="backToClassesBtn" onclick="backToClasses()" style="cursor:pointer;">← മറ്റൊരു ക്ലാസ്</div>
     </div>
 
-    <a href="reports.html" id="reportsLink" class="hidden" style="display:block;text-align:center;font-size:14px;color:var(--forest);text-decoration:underline;margin-top:10px;">📊 റിപ്പോർട്ടുകൾ കാണുക</a>
-    <a href="admin.html" id="adminLink" class="hidden" style="display:block;text-align:center;font-size:14px;color:var(--forest);text-decoration:underline;margin-top:6px;">⚙️ Admin Panel</a>
-    <div id="historyLink" class="hidden" style="text-align:center;font-size:14px;color:var(--forest);text-decoration:underline;margin-top:6px;cursor:pointer;" onclick="showHistoryScreen()">🕐 History</div>
-    <div class="logout-link hidden" id="logoutLink" onclick="doLogout()">ലോഗ്ഔട്ട്</div>
+    <div class="nav-btn-row">
+      <a href="reports.html" id="reportsLink" class="nav-btn hidden">📊 റിപ്പോർട്ടുകൾ</a>
+      <a href="admin.html" id="adminLink" class="nav-btn hidden">⚙️ Admin</a>
+      <div id="historyLink" class="nav-btn hidden" onclick="showHistoryScreen()">🕐 History</div>
+    </div>
 
     <!-- HISTORY SCREEN -->
     <div id="historyScreen" class="hidden">
       <div class="card">
         <div class="label">History (അവസാന 60 എൻട്രികൾ)</div>
         <div id="historyArea"><p class="muted">ലോഡ് ചെയ്യുന്നു...</p></div>
-        <div class="btn-outline center" style="cursor:pointer;margin-top:14px;" onclick="hideHistoryScreen()">← തിരികെ</div>
+        <div class="btn-outline center" style="cursor:pointer;margin-top:14px;" onclick="hideHistoryScreen()">← Back</div>
       </div>
     </div>
 
@@ -419,42 +431,49 @@ document.addEventListener('DOMContentLoaded', function() {
   const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
   document.getElementById('todayLine').innerText = d.toLocaleDateString('ml-IN', opts);
 
-  callApi({ action:"getTodayInfo" }).then(res => {
-    if (res.success) {
-      todayInfo = res;
-      if (res.schoolName) document.getElementById('schoolNameHeader').innerText = res.schoolName;
-    }
-  });
-
   callApi({ action:"getAppInfo" }).then(res => {
     if (!res.success) return;
     appInfo = res;
     document.getElementById('about_version').innerText = res.version;
     document.getElementById('about_school').innerText = res.schoolName;
     const callLink = document.getElementById('about_callLink');
-    if (res.developerPhone) {
-      callLink.href = 'tel:+91' + res.developerPhone;
-      callLink.innerText = '📞 Technical Support: ' + res.developerName + ' (' + res.developerPhone + ')';
-    }
-    document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName;
-
-    // Terms & Conditions gate - show once per device
-    const accepted = localStorage.getItem('wajaba_terms_accepted');
-    if (!accepted) {
-      document.getElementById('termsText').innerText = res.terms;
-      document.getElementById('termsOverlay').classList.remove('hidden');
-    }
+    callLink.innerText = res.developerPhone
+      ? '📞 Technical Support: ' + res.developerName + ' (' + res.developerPhone + ')'
+      : '📞 Technical Support: ' + res.developerName;
+    if (res.developerPhone) callLink.href = 'tel:+91' + res.developerPhone;
+    document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName + ' · ' + res.developerName;
   });
 
+  // Wait for today's info (holiday / milk / egg mandatory) to fully load BEFORE
+  // showing any class or entry screen - avoids a race where the form renders
+  // with stale defaults and then blocks submission with contradictory rules.
+  callApi({ action:"getTodayInfo" }).then(res => {
+    if (res.success) {
+      todayInfo = res;
+      if (res.schoolName) document.getElementById('schoolNameHeader').innerText = res.schoolName;
+    }
+    restoreSessionIfAny();
+  }).catch(restoreSessionIfAny);
+});
+
+function restoreSessionIfAny(){
   const saved = localStorageSafeGet();
   if (saved) {
     session = saved;
     showClassScreen();
+    checkAndShowTerms();
   }
-});
+}
 
+function checkAndShowTerms(){
+  const key = 'wajaba_terms_accepted_' + session.teacherId;
+  if (!localStorage.getItem(key)) {
+    document.getElementById('termsText').innerText = (appInfo && appInfo.terms) || 'നിബന്ധനകൾ ലോഡ് ചെയ്യുന്നു...';
+    document.getElementById('termsOverlay').classList.remove('hidden');
+  }
+}
 function acceptTerms(){
-  localStorage.setItem('wajaba_terms_accepted', 'yes');
+  localStorage.setItem('wajaba_terms_accepted_' + session.teacherId, 'yes');
   document.getElementById('termsOverlay').classList.add('hidden');
 }
 function openAbout(){ document.getElementById('aboutModal').classList.remove('hidden'); }
@@ -462,6 +481,17 @@ function closeAbout(){ document.getElementById('aboutModal').classList.add('hidd
 
 function clearZero(el){ if (el.value === '0') el.value = ''; }
 function restoreZero(el){ if (el.value.trim() === '') el.value = '0'; calcTotals(); }
+function checkRollLimit(fieldId, kind){
+  const cls = session.selectedClass;
+  if (!cls) return;
+  const limit = kind === 'boys' ? cls.totalBoys : cls.totalGirls;
+  if (!limit) return; // not set by admin - skip check
+  const val = parseInt(document.getElementById(fieldId).value) || 0;
+  if (val > limit) {
+    alert('നിങ്ങൾ എൻറർ ചെയ്തത് ക്ലാസിലെ ' + (kind === 'boys' ? 'ആൺകുട്ടികളുടെ' : 'പെൺകുട്ടികളുടെ') +
+      ' എണ്ണത്തേക്കാൾ (' + limit + ') കൂടുതലാണ്. ദയവായി ഒന്നുകൂടെ പരിശോധിക്കുക.');
+  }
+}
 
 // in-memory fallback since localStorage may be unavailable in some contexts
 function localStorageSafeGet(){
@@ -533,6 +563,7 @@ function doLogin() {
       session = { teacherId: res.teacherId, name: res.name, role: res.role, classes: res.classes };
       localStorageSafeSet(session);
       showClassScreen();
+      checkAndShowTerms();
     } else {
       errEl.innerText = res.message || "ലോഗിൻ പരാജയപ്പെട്ടു";
       errEl.classList.remove('hidden');
@@ -553,7 +584,6 @@ function doLogout(){
   document.getElementById('entryScreen').classList.add('hidden');
   document.getElementById('historyScreen').classList.add('hidden');
   document.getElementById('historyLink').classList.add('hidden');
-  document.getElementById('logoutLink').classList.add('hidden');
   document.getElementById('reportsLink').classList.add('hidden');
   document.getElementById('adminLink').classList.add('hidden');
   document.getElementById('profileIcon').classList.add('hidden');
@@ -567,7 +597,6 @@ function showClassScreen() {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('entryScreen').classList.add('hidden');
   document.getElementById('classScreen').classList.remove('hidden');
-  document.getElementById('logoutLink').classList.remove('hidden');
   document.getElementById('welcomeText').innerText = "സ്വാഗതം, " + session.name;
 
   const reportRoles = ['clerk','headmaster','admin'];

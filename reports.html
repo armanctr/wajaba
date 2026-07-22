@@ -130,8 +130,8 @@
       <div class="card controls">
         <div class="label">റിപ്പോർട്ട് തരം</div>
         <div class="report-type-grid">
-          <div class="type-btn" data-type="divisionWise" onclick="selectType('divisionWise')">Division അടിസ്ഥാനത്തിൽ</div>
           <div class="type-btn" data-type="standardWise" onclick="selectType('standardWise')">Standard അടിസ്ഥാനത്തിൽ</div>
+          <div class="type-btn" data-type="divisionWise" onclick="selectType('divisionWise')">Division അടിസ്ഥാനത്തിൽ</div>
           <div class="type-btn" data-type="register" onclick="selectType('register')">രജിസ്റ്റർ ഫോർമാറ്റ്</div>
           <div class="type-btn" data-type="govtUpload" onclick="selectType('govtUpload')">വെബ്സൈറ്റ് അപ്‌ലോഡ്</div>
         </div>
@@ -158,7 +158,7 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyjqARLU3iPeLSWPUYmKgTZGfoie1DP7otoJTfiCBL9gIj1LadsI8_b9pS_oS7SkNlD/exec";
 let session = { teacherId:null, name:null, role:null };
-let selectedType = 'divisionWise';
+let selectedType = 'standardWise';
 let lastRows = [];
 let lastReportType = '';
 
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function(){
   selectDayOffset(0);
 
   callApi({ action:"getAppInfo" }).then(res=>{
-    if (res.success) document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName + (res.developerPhone ? ' · Support: ' + res.developerPhone : '');
+    if (res.success) document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName + ' · ' + res.developerName + (res.developerPhone ? ' (' + res.developerPhone + ')' : '');
   });
 
   const saved = localGet();
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function(){
   } else if (saved) {
     // logged in elsewhere but role doesn't have report access - don't auto-show reports
   }
-  selectType('divisionWise');
+  selectType('standardWise');
 });
 
 function selectDayOffset(n){
