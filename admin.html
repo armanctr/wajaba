@@ -501,18 +501,15 @@ function saveTeacher(){
   });
 }
 function sendWhatsapp(targetTeacherId){
-  // Open the tab immediately (synchronous, direct user-gesture) to avoid popup blockers,
-  // then redirect it once the server has generated the WhatsApp link.
-  const w = window.open('', '_blank');
-  if (w) { w.document.write('തയ്യാറാക്കുന്നു...'); }
+  // Same-tab navigation - not a popup, so no blocker issue, and Android correctly
+  // hands this off to the WhatsApp app directly (no intermediate landing page).
+  showStatus('info', 'WhatsApp തുറക്കുന്നു...', 'msgTeacher');
   callApi({ action:"adminGetTeacherWhatsappLink", teacherId: session.teacherId, targetTeacherId, baseUrl: location.href.substring(0, location.href.lastIndexOf('/') + 1) + 'index.html' }).then(res=>{
     if (!res.success){
       showStatus('error', esc(res.message), 'msgTeacher');
-      if (w) w.close();
       return;
     }
-    if (w) w.location = res.waLink;
-    else window.open(res.waLink, '_blank'); // popup was blocked outright - fallback
+    window.location.href = res.waLink;
   });
 }
 
