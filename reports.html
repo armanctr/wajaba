@@ -106,8 +106,14 @@
   </header>
 
   <main>
+    <!-- SPLASH -->
+    <div id="splashScreen" style="text-align:center;padding:60px 20px;">
+      <div class="spinner" style="width:36px;height:36px;border-width:4px;border-top-color:var(--gold);border-color:rgba(21,63,53,0.15);margin:0 auto 16px;"></div>
+      <p class="muted">ലോഡ് ചെയ്യുന്നു...</p>
+    </div>
+
     <!-- LOGIN -->
-    <div id="loginScreen">
+    <div id="loginScreen" class="hidden">
       <div class="card">
         <div class="label">മൊബൈൽ നമ്പർ</div>
         <input type="text" id="loginMobile" maxlength="10" inputmode="numeric" placeholder="10 അക്ക നമ്പർ">
@@ -181,11 +187,12 @@ document.addEventListener('DOMContentLoaded', function(){
     if (res.success) document.getElementById('footerNote').innerText = 'WAJABA v' + res.version + ' · ' + res.schoolName + ' · ' + res.developerName + (res.developerPhone ? ' (' + res.developerPhone + ')' : '');
   });
 
+  document.getElementById('splashScreen').classList.add('hidden');
   const saved = localGet();
   if (saved && ['clerk','headmaster','admin'].indexOf(String(saved.role||'').trim().toLowerCase()) !== -1){
     session = saved; showReportScreen();
-  } else if (saved) {
-    // logged in elsewhere but role doesn't have report access - don't auto-show reports
+  } else {
+    document.getElementById('loginScreen').classList.remove('hidden');
   }
   selectType('standardWise');
 });

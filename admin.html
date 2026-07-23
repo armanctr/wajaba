@@ -120,13 +120,19 @@
       <div class="about-row"><span>School</span><span id="about_school">-</span></div>
       <a href="#" id="about_callLink" class="call-link">📞 Technical Support: -</a>
       <button class="btn btn-outline" style="margin-top:14px;" onclick="closeAbout()">അടയ്ക്കുക</button>
-      <button class="btn btn-outline" style="margin-top:10px;color:var(--red);border-color:#F3C9C3;" onclick="doLogout()">ലോഗ്ഔട്ട്</button>
+      <button class="btn btn-outline" style="margin-top:10px;color:var(--red);border-color:#F3C9C3;" onclick="doLogout()">Logout</button>
     </div>
   </div>
 
   <main>
+    <!-- SPLASH -->
+    <div id="splashScreen" style="text-align:center;padding:60px 20px;">
+      <div class="spinner" style="width:36px;height:36px;border-width:4px;border-top-color:var(--gold);border-color:rgba(21,63,53,0.15);margin:0 auto 16px;"></div>
+      <p class="muted">ലോഡ് ചെയ്യുന്നു...</p>
+    </div>
+
     <!-- LOGIN -->
-    <div id="loginScreen">
+    <div id="loginScreen" class="hidden">
       <div class="card">
         <div class="label">മൊബൈൽ നമ്പർ</div>
         <input type="text" id="loginMobile" maxlength="10" inputmode="numeric" placeholder="10 അക്ക നമ്പർ">
@@ -368,9 +374,12 @@ document.addEventListener('DOMContentLoaded', function(){
       : '📞 Technical Support: ' + res.developerName;
     if (res.developerPhone) callLink.href = 'tel:+91' + res.developerPhone;
   });
+  document.getElementById('splashScreen').classList.add('hidden');
   const saved = localGet();
   if (saved && String(saved.role||'').trim().toLowerCase() === 'admin'){
     session = saved; showAdminScreen();
+  } else {
+    document.getElementById('loginScreen').classList.remove('hidden');
   }
 });
 
@@ -496,7 +505,7 @@ function sendWhatsapp(targetTeacherId){
   // then redirect it once the server has generated the WhatsApp link.
   const w = window.open('', '_blank');
   if (w) { w.document.write('തയ്യാറാക്കുന്നു...'); }
-  callApi({ action:"adminGetTeacherWhatsappLink", teacherId: session.teacherId, targetTeacherId, baseUrl: location.origin + '/index.html' }).then(res=>{
+  callApi({ action:"adminGetTeacherWhatsappLink", teacherId: session.teacherId, targetTeacherId, baseUrl: location.href.substring(0, location.href.lastIndexOf('/') + 1) + 'index.html' }).then(res=>{
     if (!res.success){
       showStatus('error', esc(res.message), 'msgTeacher');
       if (w) w.close();
@@ -636,7 +645,6 @@ function loadDashboard(){
       <div class="grid2" style="margin-bottom:16px;">
         <div class="card" style="background:#FCF3E0;margin-bottom:0;">
           <div class="muted">ആകെ ഭക്ഷണം</div><div style="font-size:26px;font-weight:800;">${res.totals.total}</div>
-          <div class="muted">ആൺ ${res.totals.boys} · പെൺ ${res.totals.girls}</div>
         </div>
         <div class="card" style="background:#E8F3EC;margin-bottom:0;">
           <div class="muted">പാൽ / മുട്ട</div><div style="font-size:26px;font-weight:800;">${res.totals.milk} / ${res.totals.egg}</div>
@@ -653,8 +661,8 @@ function loadDashboard(){
         </div>
       </div>
       <div class="section-title">Standard അടിസ്ഥാനത്തിൽ (ഇന്ന്)</div>
-      <div class="table-scroll"><table><thead><tr><th>Standard</th><th>ആൺ</th><th>പെൺ</th><th>ആകെ</th><th>പാൽ</th><th>മുട്ട</th></tr></thead><tbody>
-        ${res.standardWise.map((r,i)=>`<tr class="${i===res.standardWise.length-1?'total-row':''}"><td>${esc(r.standard)}</td><td>${r.boys}</td><td>${r.girls}</td><td>${r.total}</td><td>${r.milk}</td><td>${r.egg}</td></tr>`).join('')}
+      <div class="table-scroll"><table><thead><tr><th>Standard</th><th>ആകെ ഭക്ഷണം</th><th>ആകെ പാൽ</th><th>ആകെ മുട്ട</th></tr></thead><tbody>
+        ${res.standardWise.map((r,i)=>`<tr class="${i===res.standardWise.length-1?'total-row':''}"><td>${esc(r.standard)}</td><td>${r.total}</td><td>${r.milk}</td><td>${r.egg}</td></tr>`).join('')}
       </tbody></table></div>`;
     area.innerHTML = html;
   });

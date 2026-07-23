@@ -244,7 +244,7 @@
       <div class="about-row"><span>School</span><span id="about_school">-</span></div>
       <a href="#" id="about_callLink" class="call-link">📞 Technical Support: -</a>
       <button class="btn btn-outline" style="margin-top:14px;" onclick="closeAbout()">അടയ്ക്കുക</button>
-      <button class="btn btn-outline" id="about_logoutBtn" style="margin-top:10px;color:var(--red);border-color:#F3C9C3;" onclick="doLogout()">ലോഗ്ഔട്ട്</button>
+      <button class="btn btn-outline" id="about_logoutBtn" style="margin-top:10px;color:var(--red);border-color:#F3C9C3;" onclick="doLogout()">Logout</button>
     </div>
   </div>
 
@@ -261,14 +261,20 @@
       </div>
     </div>
     <div id="profileIcon" class="hidden" onclick="openAbout()" style="position:absolute;top:20px;right:20px;width:38px;height:38px;border-radius:50%;background:rgba(217,166,46,0.25);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;cursor:pointer;z-index:5;">👤</div>
-    <div class="school-name" id="schoolNameHeader">സ്കൂൾ ഉച്ചഭക്ഷണ കണക്ക്</div>
+    <div class="school-name" id="schoolNameHeader">Mid Day Meal Management</div>
     <div class="today-line" id="todayLine">തീയതി ലോഡ് ചെയ്യുന്നു...</div>
   </header>
 
   <main>
 
+    <!-- SPLASH / LOADING SCREEN -->
+    <div id="splashScreen" style="text-align:center;padding:60px 20px;">
+      <div class="spinner" style="width:36px;height:36px;border-width:4px;border-top-color:var(--gold);border-color:rgba(21,63,53,0.15);margin:0 auto 16px;"></div>
+      <p class="muted">ലോഡ് ചെയ്യുന്നു...</p>
+    </div>
+
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen">
+    <div id="loginScreen" class="hidden">
       <div class="card">
         <div class="label">മൊബൈൽ നമ്പർ</div>
         <input type="tel" id="loginMobile" placeholder="10 അക്ക നമ്പർ" maxlength="10" inputmode="numeric">
@@ -456,25 +462,36 @@ document.addEventListener('DOMContentLoaded', function() {
   }).catch(restoreSessionIfAny);
 });
 
+function hideSplash(){
+  document.getElementById('splashScreen').classList.add('hidden');
+}
+
 function restoreSessionIfAny(){
+  hideSplash();
   const saved = localStorageSafeGet();
   if (saved) {
     session = saved;
-    showClassScreen();
-    checkAndShowTerms();
+    proceedAfterTermsCheck();
+  } else {
+    document.getElementById('loginScreen').classList.remove('hidden');
   }
 }
 
-function checkAndShowTerms(){
+// Shows Terms & Conditions first (if not yet accepted by this teacher on this
+// device) and only proceeds to the class screen after acceptance.
+function proceedAfterTermsCheck(){
   const key = 'wajaba_terms_accepted_' + session.teacherId;
   if (!localStorage.getItem(key)) {
     document.getElementById('termsText').innerText = (appInfo && appInfo.terms) || 'നിബന്ധനകൾ ലോഡ് ചെയ്യുന്നു...';
     document.getElementById('termsOverlay').classList.remove('hidden');
+  } else {
+    showClassScreen();
   }
 }
 function acceptTerms(){
   localStorage.setItem('wajaba_terms_accepted_' + session.teacherId, 'yes');
   document.getElementById('termsOverlay').classList.add('hidden');
+  showClassScreen();
 }
 function openAbout(){ document.getElementById('aboutModal').classList.remove('hidden'); }
 function closeAbout(){ document.getElementById('aboutModal').classList.add('hidden'); }
@@ -562,8 +579,7 @@ function doLogin() {
     if (res.success) {
       session = { teacherId: res.teacherId, name: res.name, role: res.role, classes: res.classes };
       localStorageSafeSet(session);
-      showClassScreen();
-      checkAndShowTerms();
+      proceedAfterTermsCheck();
     } else {
       errEl.innerText = res.message || "ലോഗിൻ പരാജയപ്പെട്ടു";
       errEl.classList.remove('hidden');
@@ -698,22 +714,30 @@ function calcTotals() {
 
 function confirmSubmit() {
   const val = id => parseInt(document.getElementById(id).value) || 0;
-  const totalFood = val('boys') + val('girls');
 
-  if (totalFood === 0) {
-    alert("ഭക്ഷണം കഴിച്ചവരുടെ എണ്ണം നൽകുക");
-    return;
+  // Instead of blocking zero values outright, list whichever relevant fields
+  // are zero and ask the teacher to explicitly confirm - this allows genuine
+  // zero days (e.g. only boys absent, or milk skipped one day) while still
+  // catching accidental blank submissions.
+  const zeroFields = [];
+  if (val('boys') === 0) zeroFields.push('ഭക്ഷണം (Boys) = 0');
+  if (val('girls') === 0) zeroFields.push('ഭക്ഷണം (Girls) = 0');
+  if (todayInfo.milkMandatory) {
+    if (val('milkBoys') === 0) zeroFields.push('പാൽ (Boys) = 0');
+    if (val('milkGirls') === 0) zeroFields.push('പാൽ (Girls) = 0');
   }
-  if (todayInfo.milkMandatory && (val('milkBoys') + val('milkGirls')) === 0) {
-    alert("ഇന്ന് പാൽ നിർബന്ധമാണ്. പാൽ കണക്ക് നൽകുക");
-    return;
-  }
-  if (todayInfo.eggMandatory && (val('eggBoys') + val('eggGirls')) === 0) {
-    alert("ഇന്ന് മുട്ട നിർബന്ധമാണ്. മുട്ട കണക്ക് നൽകുക");
-    return;
+  if (todayInfo.eggMandatory) {
+    if (val('eggBoys') === 0) zeroFields.push('മുട്ട (Boys) = 0');
+    if (val('eggGirls') === 0) zeroFields.push('മുട്ട (Girls) = 0');
   }
 
-  if (!confirm("കണക്ക് Submit ചെയ്യണോ? Submit ചെയ്ത ശേഷം തിരുത്താൻ കഴിയില്ല.")) return;
+  let confirmMsg = "കണക്ക് Submit ചെയ്യണോ? Submit ചെയ്ത ശേഷം തിരുത്താൻ കഴിയില്ല.";
+  if (zeroFields.length > 0) {
+    confirmMsg = "താഴെ പറയുന്നവ 0 ആയി രേഖപ്പെടുത്തും:\n\n" +
+      zeroFields.map(f => '• ' + f).join('\n') +
+      "\n\nഇത് ശരിയാണോ? Submit ചെയ്യണോ?";
+  }
+  if (!confirm(confirmMsg)) return;
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
