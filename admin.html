@@ -31,6 +31,7 @@
   main{padding:20px;}
   .card{background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:0 2px 14px rgba(21,63,53,0.06);margin-bottom:16px;}
   .label{font-size:14px;font-weight:600;margin-bottom:6px;}
+  .req-star{color:#C0392B;font-size:12px;}
   input[type=text],input[type=password],input[type=date],select{
     width:100%;padding:13px;font-size:16px;font-family:inherit;border:2px solid var(--line);
     border-radius:10px;margin-bottom:12px;background:var(--cream);color:var(--forest-dark);
@@ -179,8 +180,8 @@
           <div class="section-title">പുതിയ Teacher ചേർക്കുക / Edit ചെയ്യുക</div>
           <input type="hidden" id="t_TeacherID">
           <div class="grid2">
-            <div><div class="label">Name</div><input type="text" id="t_Name"></div>
-            <div><div class="label">Mobile</div><input type="text" id="t_Mobile" maxlength="10" inputmode="numeric" placeholder="10 അക്കം"></div>
+            <div><div class="label">Name <span class="req-star">★</span></div><input type="text" id="t_Name"></div>
+            <div><div class="label">Mobile <span class="req-star">★</span></div><input type="text" id="t_Mobile" maxlength="10" inputmode="numeric" placeholder="10 അക്കം"></div>
           </div>
           <div class="label">Role</div>
           <select id="t_Role">
@@ -217,12 +218,12 @@
           <div class="section-title">പുതിയ ക്ലാസ് ചേർക്കുക / Edit ചെയ്യുക</div>
           <input type="hidden" id="c_ClassID">
           <div class="grid2">
-            <div><div class="label">Standard</div><input type="text" id="c_Standard" placeholder="1, LKG, etc"></div>
-            <div><div class="label">Division</div><input type="text" id="c_Division" placeholder="A"></div>
+            <div><div class="label">Standard <span class="req-star">★</span></div><input type="text" id="c_Standard" placeholder="1, LKG, etc"></div>
+            <div><div class="label">Division <span class="req-star">★</span></div><input type="text" id="c_Division" placeholder="A"></div>
           </div>
           <div class="grid2">
-            <div><div class="label">ആകെ ആൺകുട്ടികൾ (ഐച്ഛികം)</div><input type="text" id="c_TotalBoys" inputmode="numeric" placeholder="0"></div>
-            <div><div class="label">ആകെ പെൺകുട്ടികൾ (ഐച്ഛികം)</div><input type="text" id="c_TotalGirls" inputmode="numeric" placeholder="0"></div>
+            <div><div class="label">ആകെ ആൺകുട്ടികൾ</div><input type="text" id="c_TotalBoys" inputmode="numeric" placeholder="0"></div>
+            <div><div class="label">ആകെ പെൺകുട്ടികൾ</div><input type="text" id="c_TotalGirls" inputmode="numeric" placeholder="0"></div>
           </div>
           <p class="muted" style="margin-top:-6px;">ഇത് നൽകിയാൽ, ടീച്ചർ ഇതിലും കൂടുതൽ എണ്ണം entry ചെയ്യുമ്പോൾ ഒരു മുന്നറിയിപ്പ് കാണിക്കും</p>
           <div id="msgClass"></div>
@@ -273,7 +274,7 @@
         <div class="card">
           <div class="section-title">പുതിയ അവധി ദിവസം ചേർക്കുക</div>
           <div class="grid2">
-            <div><div class="label">Date</div><input type="date" id="h_Date"></div>
+            <div><div class="label">Date <span class="req-star">★</span></div><input type="date" id="h_Date"></div>
             <div><div class="label">Reason</div><input type="text" id="h_Reason"></div>
           </div>
           <div id="msgHoliday"></div>
